@@ -30,7 +30,7 @@ export function TopBar({ title, showSearch = true, rightSlot, className }: TopBa
       )}
 
       {showSearch && (
-        <Link to="/explore" className="ml-2 flex-1">
+        <Link to="/explore" className="ml-2 max-w-sm flex-1 md:max-w-md">
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input

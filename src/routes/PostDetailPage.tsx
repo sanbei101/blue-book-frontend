@@ -30,8 +30,14 @@ export function PostDetailPage({ postId }: { postId: string }) {
   const [comment, setComment] = useState("");
   const [post, setPost] = useState<ApiGetPostsResponse | undefined>(undefined);
   const [comments, setComments] = useState<ApiCommentResponse[]>([]);
+  const [coverRatio, setCoverRatio] = useState<number | null>(null);
   const [related, setRelated] = useState<ApiListPostsItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleImageSelect = (i: number) => {
+    setActiveImage(i);
+    setCoverRatio(null);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -87,11 +93,24 @@ export function PostDetailPage({ postId }: { postId: string }) {
   const dotButtons = media.map((_, i) => i);
 
   return (
-    <div className="bg-background">
+    <div className="bg-background mx-auto max-w-5xl">
       {/* Hero image */}
-      <div className="bg-muted relative aspect-[3/4] w-full overflow-hidden">
+      <div
+        className="bg-muted relative mx-auto w-full max-w-xl overflow-hidden"
+        style={{ aspectRatio: coverRatio ?? 3 / 4 }}
+      >
         {cover ? (
-          <img src={cover} alt={post.title} className="size-full object-cover" />
+          <img
+            src={cover}
+            alt={post.title}
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth && img.naturalHeight) {
+                setCoverRatio(img.naturalWidth / img.naturalHeight);
+              }
+            }}
+            className="size-full object-contain"
+          />
         ) : (
           <div className="from-primary/20 to-primary/5 size-full bg-gradient-to-br" />
         )}
@@ -111,7 +130,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
             {dotButtons.map((i) => (
               <button
                 key={i}
-                onClick={() => setActiveImage(i)}
+                onClick={() => handleImageSelect(i)}
                 className={`h-1.5 rounded-full transition-all ${
                   i === activeImage ? "w-6 bg-white" : "w-1.5 bg-white/50"
                 }`}
@@ -215,7 +234,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
         </TabsContent>
       </Tabs>
 
-      <div className="border-border/60 bg-background/95 fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t px-3 py-2 backdrop-blur">
+      <div className="border-border/60 bg-background/95 fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-5xl items-center gap-2 border-t px-3 py-2 backdrop-blur">
         <Input
           value={comment}
           onChange={(e) => setComment(e.target.value)}

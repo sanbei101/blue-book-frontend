@@ -14,7 +14,6 @@ type PostCardProps = {
     view_count?: number;
     author?: { id?: string; username?: string; avatar_url?: string };
   };
-  height?: number;
 };
 
 const COVER_GRADIENTS = [
@@ -31,10 +30,11 @@ function coverGradient(seed: string) {
   return COVER_GRADIENTS[Math.abs(h) % COVER_GRADIENTS.length];
 }
 
-export function PostCard({ post, height = 280 }: PostCardProps) {
+export function PostCard({ post }: PostCardProps) {
   const id = post.id ?? "";
   const [imgFailed, setImgFailed] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [ratio, setRatio] = useState<number | null>(null);
 
   return (
     <Card className="gap-0 rounded-2xl py-0 ring-1 ring-foreground/5">
@@ -49,13 +49,19 @@ export function PostCard({ post, height = 280 }: PostCardProps) {
             "relative w-full overflow-hidden bg-muted",
             `bg-gradient-to-br ${coverGradient(id || post.title || "x")}`,
           )}
-          style={{ aspectRatio: `3 / ${(height / 200).toFixed(2)}` }}
+          style={{ aspectRatio: ratio ?? 3 / 4 }}
         >
           {post.cover_url && !imgFailed ? (
             <img
               src={post.cover_url}
               alt={post.title ?? ""}
               loading="lazy"
+              onLoad={(e) => {
+                const img = e.currentTarget;
+                if (img.naturalWidth && img.naturalHeight) {
+                  setRatio(img.naturalWidth / img.naturalHeight);
+                }
+              }}
               onError={() => setImgFailed(true)}
               className="size-full object-cover transition-transform duration-300 hover:scale-[1.02]"
             />

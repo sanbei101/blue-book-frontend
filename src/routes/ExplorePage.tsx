@@ -86,7 +86,7 @@ export function ExplorePage() {
 
       <div className="px-3">
         <h2 className="text-sm font-semibold">分类</h2>
-        <div className="mt-2 grid grid-cols-2 gap-2.5">
+        <div className="mt-2 grid grid-cols-2 gap-2.5 md:grid-cols-4">
           {categories.map((c) => (
             <Card
               key={c.name}

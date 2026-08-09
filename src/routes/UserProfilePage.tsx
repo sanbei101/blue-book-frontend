@@ -86,7 +86,7 @@ export function UserProfilePage({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="bg-background pb-16">
+    <div className="bg-background mx-auto max-w-5xl pb-16">
       <header className="border-border/60 bg-background/95 sticky top-0 z-30 flex h-12 items-center justify-between border-b px-3 backdrop-blur">
         <Link
           to="/"
