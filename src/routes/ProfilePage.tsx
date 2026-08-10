@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Settings, Share2, Edit3, Grid3x3, Bookmark, Heart, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +7,7 @@ import type {
   ApiListPostsItemResponse,
   ApiUserResponse,
 } from "@/api/api.schemas";
-import { getAuthMe, postAuthLogin } from "@/api/auth/auth";
+import { getAuthMe } from "@/api/auth/auth";
 import { getMeCollections } from "@/api/collections/collections";
 import { getUsersUserIdFollowers, getUsersUserIdFollowing } from "@/api/follows/follows";
 import { getPostsUserUserId } from "@/api/posts/posts";
@@ -22,6 +21,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCount } from "@/lib/utils";
 import { ApiError } from "@/mutator";
+
+import { AuthPage } from "./UserProfilePage";
 
 const ME_KEY = "blue_book:me";
 
@@ -71,23 +72,6 @@ export function ProfilePage() {
     };
   }, [meId]);
 
-  const handleLogin = async () => {
-    try {
-      const res = await postAuthLogin({ username: "demo", password: "demo123" });
-      const auth = res.data;
-      if (auth?.access_token) localStorage.setItem("access_token", auth.access_token);
-      if (auth?.refresh_token) localStorage.setItem("refresh_token", auth.refresh_token);
-      if (auth?.user?.id) {
-        localStorage.setItem(ME_KEY, auth.user.id);
-        setMeId(auth.user.id);
-      }
-      toast.success("已登录");
-    } catch (err) {
-      if (err instanceof ApiError) toast.error(err.msg || "登录失败,请检查后端服务");
-      else toast.error("登录失败,请检查后端服务");
-    }
-  };
-
   return (
     <>
       <TopBar
@@ -106,7 +90,7 @@ export function ProfilePage() {
       />
 
       {!meId ? (
-        <NotLoggedIn onLogin={handleLogin} />
+        <AuthPage onAuthenticated={setMeId} />
       ) : userLoading ? (
         <div className="space-y-3 p-4">
           <Skeleton className="h-24 w-full rounded-2xl" />
@@ -231,26 +215,6 @@ export function ProfilePage() {
         <p className="text-muted-foreground p-6 text-center text-sm">加载失败</p>
       )}
     </>
-  );
-}
-
-function NotLoggedIn({ onLogin }: { onLogin: () => void }) {
-  return (
-    <div className="flex flex-col items-center gap-4 p-8 pt-16 text-center">
-      <Avatar className="ring-primary/20 size-20 ring-2">
-        <AvatarFallback>👤</AvatarFallback>
-      </Avatar>
-      <div>
-        <h2 className="text-lg font-semibold">登录后体验更多功能</h2>
-        <p className="text-muted-foreground mt-1 text-sm">发布笔记、关注创作者、收藏喜欢的内容</p>
-      </div>
-      <Button onClick={onLogin} className="w-full max-w-xs rounded-full">
-        登录 / 注册
-      </Button>
-      <Link to="/" className="text-muted-foreground hover:text-primary text-xs">
-        暂不登录,先看看
-      </Link>
-    </div>
   );
 }
 

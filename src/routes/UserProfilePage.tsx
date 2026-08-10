@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  BookOpen,
+  LoaderCircle,
   MoreHorizontal,
   MessageCircle,
   Share2,
@@ -8,10 +11,11 @@ import {
   Heart,
   Bookmark,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type SubmitEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import type { ApiUserResponse, ApiListPostsItemResponse } from "@/api/api.schemas";
+import { postAuthLogin, postAuthRegister } from "@/api/auth/auth";
 import {
   deleteUsersUserIdFollow,
   getUsersUserIdFollowers,
@@ -23,11 +27,187 @@ import { getUsersUserId } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCount } from "@/lib/utils";
 import { ApiError } from "@/mutator";
+
+const ME_KEY = "blue_book:me";
+
+type AuthMode = "login" | "register";
+
+export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: string) => void }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleModeChange = (value: string) => {
+    if (value === "login" || value === "register") {
+      setMode(value);
+      setError("");
+    }
+  };
+
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedUsername = username.trim();
+
+    if (normalizedUsername.length < 3 || normalizedUsername.length > 32) {
+      setError("用户名长度需为 3-32 个字符");
+      return;
+    }
+    if (password.length < 6 || password.length > 128) {
+      setError("密码长度需为 6-128 个字符");
+      return;
+    }
+    if (mode === "register" && password !== confirmPassword) {
+      setError("两次输入的密码不一致");
+      return;
+    }
+
+    setSubmitting(true);
+    setError("");
+    try {
+      const response =
+        mode === "login"
+          ? await postAuthLogin({ username: normalizedUsername, password })
+          : await postAuthRegister({ username: normalizedUsername, password });
+      const auth = response.data;
+
+      if (!auth?.access_token) {
+        setError("登录凭证获取失败,请稍后重试");
+        return;
+      }
+
+      localStorage.setItem("access_token", auth.access_token);
+      if (auth.refresh_token) localStorage.setItem("refresh_token", auth.refresh_token);
+      if (auth.user?.id) localStorage.setItem(ME_KEY, auth.user.id);
+
+      toast.success(mode === "login" ? "登录成功" : "注册成功");
+      if (auth.user?.id) onAuthenticated?.(auth.user.id);
+      if (!onAuthenticated) void navigate({ to: "/me" });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.msg : mode === "login" ? "登录失败" : "注册失败");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <main className="bg-background flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
+        <Link
+          to="/"
+          className="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-1.5 text-sm"
+        >
+          <ArrowLeft className="size-4" />
+          返回首页
+        </Link>
+
+        <div className="mb-8 flex items-center gap-3">
+          <div className="bg-primary text-primary-foreground flex size-11 items-center justify-center rounded-xl">
+            <BookOpen className="size-6" />
+          </div>
+          <div>
+            <p className="text-primary text-2xl font-bold tracking-tight">小红书</p>
+            <p className="text-muted-foreground text-sm">记录生活,发现真实有趣</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{mode === "login" ? "欢迎回来" : "创建你的账号"}</CardTitle>
+            <CardDescription>
+              {mode === "login" ? "登录后继续你的生活记录" : "加入小红书,分享你的生活灵感"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={mode} onValueChange={handleModeChange} className="gap-5">
+              <TabsList className="grid h-10 w-full grid-cols-2">
+                <TabsTrigger value="login">登录</TabsTrigger>
+                <TabsTrigger value="register">注册</TabsTrigger>
+              </TabsList>
+              <TabsContent value={mode} className="mt-0">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label htmlFor="auth-username" className="text-sm font-medium">
+                      用户名
+                    </label>
+                    <Input
+                      id="auth-username"
+                      value={username}
+                      onChange={(event) => setUsername(event.target.value)}
+                      placeholder="请输入用户名"
+                      autoComplete="username"
+                      minLength={3}
+                      maxLength={32}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label htmlFor="auth-password" className="text-sm font-medium">
+                      密码
+                    </label>
+                    <Input
+                      id="auth-password"
+                      type="password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="请输入密码"
+                      autoComplete={mode === "login" ? "current-password" : "new-password"}
+                      minLength={6}
+                      maxLength={128}
+                      required
+                    />
+                  </div>
+                  {mode === "register" && (
+                    <div className="space-y-1.5">
+                      <label htmlFor="auth-confirm-password" className="text-sm font-medium">
+                        确认密码
+                      </label>
+                      <Input
+                        id="auth-confirm-password"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                        placeholder="请再次输入密码"
+                        autoComplete="new-password"
+                        minLength={6}
+                        maxLength={128}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {error && (
+                    <p role="alert" className="text-destructive text-sm">
+                      {error}
+                    </p>
+                  )}
+
+                  <Button type="submit" className="h-10 w-full" disabled={submitting}>
+                    {submitting && <LoaderCircle className="animate-spin" />}
+                    {submitting ? "提交中..." : mode === "login" ? "登录" : "注册"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <p className="text-muted-foreground mt-6 text-center text-xs">
+          登录即代表你同意小红书的服务协议与隐私政策
+        </p>
+      </div>
+    </main>
+  );
+}
 
 export function UserProfilePage({ userId }: { userId: string }) {
   const [following, setFollowing] = useState(false);
