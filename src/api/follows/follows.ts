@@ -9,7 +9,7 @@ import { customInstance } from "../../mutator";
 import type {
   GetUsersUserIdFollowersParams,
   GetUsersUserIdFollowingParams,
-  RenderResponseApiFollowResponse,
+  RenderResponseApiFollowStatusResponse,
   RenderResponseArrayApiFollowUserResponse,
 } from "../api.schemas";
 
@@ -20,9 +20,9 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  */
 export const deleteUsersUserIdFollow = (
   userId: string,
-  options?: SecondParameter<typeof customInstance<RenderResponseApiFollowResponse>>,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiFollowStatusResponse>>,
 ) => {
-  return customInstance<RenderResponseApiFollowResponse>(
+  return customInstance<RenderResponseApiFollowStatusResponse>(
     { url: `/users/${userId}/follow`, method: "DELETE" },
     options,
   );
@@ -30,12 +30,12 @@ export const deleteUsersUserIdFollow = (
 /**
  * @summary 关注用户
  */
-export const postUsersUserIdFollow = (
+export const putUsersUserIdFollow = (
   userId: string,
-  options?: SecondParameter<typeof customInstance<RenderResponseApiFollowResponse>>,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiFollowStatusResponse>>,
 ) => {
-  return customInstance<RenderResponseApiFollowResponse>(
-    { url: `/users/${userId}/follow`, method: "POST" },
+  return customInstance<RenderResponseApiFollowStatusResponse>(
+    { url: `/users/${userId}/follow`, method: "PUT" },
     options,
   );
 };
@@ -68,8 +68,8 @@ export const getUsersUserIdFollowing = (
 export type DeleteUsersUserIdFollowResult = NonNullable<
   Awaited<ReturnType<typeof deleteUsersUserIdFollow>>
 >;
-export type PostUsersUserIdFollowResult = NonNullable<
-  Awaited<ReturnType<typeof postUsersUserIdFollow>>
+export type PutUsersUserIdFollowResult = NonNullable<
+  Awaited<ReturnType<typeof putUsersUserIdFollow>>
 >;
 export type GetUsersUserIdFollowersResult = NonNullable<
   Awaited<ReturnType<typeof getUsersUserIdFollowers>>

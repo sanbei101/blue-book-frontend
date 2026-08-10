@@ -12,6 +12,8 @@ type PostCardProps = {
     title?: string;
     cover_url?: string;
     view_count?: number;
+    like_count?: number;
+    comment_count?: number;
     author?: { id?: string; username?: string; avatar_url?: string };
   };
 };
@@ -37,7 +39,7 @@ export function PostCard({ post }: PostCardProps) {
   const [ratio, setRatio] = useState<number | null>(null);
 
   return (
-    <Card className="gap-0 rounded-2xl py-0 ring-1 ring-foreground/5">
+    <Card className="ring-foreground/5 gap-0 rounded-2xl py-0 ring-1">
       <Link
         to="/posts/$postId"
         params={{ postId: id }}
@@ -82,7 +84,7 @@ export function PostCard({ post }: PostCardProps) {
         <Link
           to="/posts/$postId"
           params={{ postId: id }}
-          className="line-clamp-2 text-[13px] font-medium leading-snug text-foreground hover:text-primary"
+          className="text-foreground hover:text-primary line-clamp-2 text-[13px] leading-snug font-medium"
         >
           {post.title}
         </Link>
@@ -95,24 +97,22 @@ export function PostCard({ post }: PostCardProps) {
           >
             <Avatar size="sm">
               {post.author?.avatar_url && !avatarFailed && (
-                <AvatarImage
-                  src={post.author.avatar_url}
-                  onError={() => setAvatarFailed(true)}
-                />
+                <AvatarImage src={post.author.avatar_url} onError={() => setAvatarFailed(true)} />
               )}
               <AvatarFallback>{(post.author?.username ?? "?").slice(0, 1)}</AvatarFallback>
             </Avatar>
-            <span className="truncate text-[11px] text-muted-foreground">
+            <span className="text-muted-foreground truncate text-[11px]">
               {post.author?.username}
             </span>
           </Link>
 
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-[11px]">
             <span className="flex items-center gap-0.5">
-              <Heart className="size-3" /> 0
+              <Heart className="size-3" /> {formatCount(post.like_count)}
             </span>
             <span className="flex items-center gap-0.5">
               <MessageCircle className="size-3" />
+              {formatCount(post.comment_count)}
             </span>
           </div>
         </div>

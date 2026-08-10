@@ -1,11 +1,14 @@
-import { PostCard } from "./PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import { PostCard } from "./PostCard";
 
 type FeedItem = {
   id?: string;
   title?: string;
   cover_url?: string;
   view_count?: number;
+  like_count?: number;
+  comment_count?: number;
   author?: { id?: string; username?: string; avatar_url?: string };
 };
 

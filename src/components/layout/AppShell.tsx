@@ -1,8 +1,9 @@
 import { Outlet } from "@tanstack/react-router";
 
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+
 import { BottomNav } from "./BottomNav";
 import { DesktopNav } from "./DesktopNav";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export function AppShell() {
   return (

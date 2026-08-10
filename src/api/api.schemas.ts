@@ -20,8 +20,12 @@ export interface ApiUserResponse {
 }
 
 export interface ApiAuthResponse {
-  /** JWT token */
-  token?: string;
+  /** Access token */
+  access_token?: string;
+  /** Access token 有效期,单位为秒 */
+  expires_in?: number;
+  /** Refresh token */
+  refresh_token?: string;
   user?: ApiUserResponse;
 }
 
@@ -35,6 +39,51 @@ export interface ApiAuthorResponse {
   id?: string;
   /** 用户名 */
   username?: string;
+}
+
+export interface ApiChangePasswordRequest {
+  /**
+   * 新密码
+   * @minLength 6
+   * @maxLength 128
+   */
+  new_password: string;
+  /** 当前密码 */
+  old_password: string;
+}
+
+export interface ApiCollectPostRequest {
+  /** 收藏夹 ID,可选 */
+  folder_id?: string;
+}
+
+export interface ApiCollectionItemResponse {
+  author?: ApiAuthorResponse;
+  /** 收藏数 */
+  collect_count?: number;
+  /** 收藏时间 */
+  collected_at?: string;
+  /** 评论数 */
+  comment_count?: number;
+  /** 内容 */
+  content?: string;
+  /** 封面 URL */
+  cover_url?: string;
+  /** 帖子 ID */
+  id?: string;
+  /** 点赞数 */
+  like_count?: number;
+  /** 标题 */
+  title?: string;
+  /** 浏览量 */
+  view_count?: number;
+}
+
+export interface ApiCollectionStatusResponse {
+  /** 收藏数量 */
+  collect_count?: number;
+  /** 是否已收藏 */
+  collected?: boolean;
 }
 
 export interface ApiCommentResponse {
@@ -75,6 +124,14 @@ export interface ApiCreateCommentResponse {
   id?: string;
 }
 
+export interface ApiCreateFolderRequest {
+  /**
+   * 收藏夹名称
+   * @maxLength 50
+   */
+  name: string;
+}
+
 /**
  * 媒体类型 (image/video)
  */
@@ -100,9 +157,11 @@ export interface ApiCreatePostRequest {
   content: string;
   /** 媒体列表 */
   media?: ApiCreateMediaItem[];
+  /** 标签名称 */
+  tags?: string[];
   /**
    * 帖子标题
-   * @maxLength 200
+   * @maxLength 100
    */
   title: string;
 }
@@ -112,9 +171,33 @@ export interface ApiCreatePostResponse {
   id?: string;
 }
 
-export interface ApiFollowResponse {
-  /** 操作是否成功 */
-  ok?: boolean;
+export interface ApiCreateTagRequest {
+  /**
+   * 标签描述
+   * @maxLength 200
+   */
+  description?: string;
+  /**
+   * 标签名称
+   * @maxLength 50
+   */
+  name: string;
+}
+
+export interface ApiFolderResponse {
+  /** 创建时间 */
+  created_at?: string;
+  /** 收藏夹 ID */
+  id?: string;
+  /** 收藏夹名称 */
+  name?: string;
+}
+
+export interface ApiFollowStatusResponse {
+  /** 该用户粉丝数 */
+  follower_count?: number;
+  /** 是否已关注 */
+  following?: boolean;
 }
 
 export interface ApiFollowUserResponse {
@@ -139,24 +222,60 @@ export interface ApiMediaResponse {
   sort_order?: number;
 }
 
+export interface ApiTagResponse {
+  /** 创建时间 */
+  created_at?: string;
+  /** 标签描述 */
+  description?: string;
+  /** 标签 ID */
+  id?: string;
+  /** 标签名称 */
+  name?: string;
+  /** 帖子数量 */
+  post_count?: number;
+}
+
 export interface ApiGetPostsResponse {
   author?: ApiAuthorResponse;
+  /** 收藏数 */
+  collect_count?: number;
+  /** 当前用户是否已收藏 */
+  collected?: boolean;
+  /** 评论数 */
+  comment_count?: number;
   /** 内容 */
   content?: string;
   /** 创建时间 */
   created_at?: string;
   /** 帖子 ID */
   id?: string;
+  /** 点赞数 */
+  like_count?: number;
+  /** 当前用户是否已点赞 */
+  liked?: boolean;
   /** 媒体列表 */
   media?: ApiMediaResponse[];
+  /** 标签列表 */
+  tags?: ApiTagResponse[];
   /** 标题 */
   title?: string;
   /** 浏览量 */
   view_count?: number;
 }
 
+export interface ApiLikeStatusResponse {
+  /** 点赞数量 */
+  like_count?: number;
+  /** 是否已点赞 */
+  liked?: boolean;
+}
+
 export interface ApiListPostsItemResponse {
   author?: ApiAuthorResponse;
+  /** 收藏数 */
+  collect_count?: number;
+  /** 评论数 */
+  comment_count?: number;
   /** 内容 */
   content?: string;
   /** 封面 URL */
@@ -165,6 +284,8 @@ export interface ApiListPostsItemResponse {
   created_at?: string;
   /** 帖子 ID */
   id?: string;
+  /** 点赞数 */
+  like_count?: number;
   /** 标题 */
   title?: string;
   /** 浏览量 */
@@ -176,6 +297,24 @@ export interface ApiLoginRequest {
   password: string;
   /** 用户名 */
   username: string;
+}
+
+export interface ApiPresignMediaRequest {
+  /** 文件 MIME 类型 */
+  content_type: string;
+}
+
+export interface ApiPresignMediaResponse {
+  /** 上传地址有效期,单位为秒 */
+  expires_in?: number;
+  /** 对象存储 key,发布帖子时作为媒体 URL 使用 */
+  object_key?: string;
+  /** 上传地址 */
+  upload_url?: string;
+}
+
+export interface ApiRefreshTokenRequest {
+  refresh_token: string;
 }
 
 export interface ApiRegisterRequest {
@@ -193,27 +332,71 @@ export interface ApiRegisterRequest {
   username: string;
 }
 
-/**
- * 目标类型 (1=帖子, 2=评论)
- */
-export type ApiToggleLikeRequestTargetType =
-  (typeof ApiToggleLikeRequestTargetType)[keyof typeof ApiToggleLikeRequestTargetType];
-
-export const ApiToggleLikeRequestTargetType = {
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-} as const;
-
-export interface ApiToggleLikeRequest {
-  /** 目标 ID (帖子 ID 或 评论 ID) */
-  target_id?: string;
-  /** 目标类型 (1=帖子, 2=评论) */
-  target_type: ApiToggleLikeRequestTargetType;
+export interface ApiSearchHistoryResponse {
+  keyword?: string;
+  searched_at?: string;
 }
 
-export interface ApiToggleLikeResponse {
-  /** 是否点赞成功 */
-  ok?: boolean;
+export interface ApiSearchPostResponse {
+  author?: ApiAuthorResponse;
+  collect_count?: number;
+  comment_count?: number;
+  content?: string;
+  cover_url?: string;
+  created_at?: string;
+  id?: string;
+  like_count?: number;
+  relevance?: number;
+  title?: string;
+  view_count?: number;
+}
+
+export interface ApiSearchResponse {
+  posts?: ApiSearchPostResponse[];
+  tags?: ApiTagResponse[];
+  users?: ApiFollowUserResponse[];
+}
+
+export interface ApiTopicResponse {
+  /** 封面地址 */
+  cover_url?: string;
+  /** 创建时间 */
+  created_at?: string;
+  /** 专题描述 */
+  description?: string;
+  /** 专题 ID */
+  id?: string;
+  /** 专题名称 */
+  name?: string;
+  /** 专题帖子数量 */
+  post_count?: number;
+}
+
+export interface ApiTrendingSearchResponse {
+  keyword?: string;
+  search_count?: number;
+}
+
+export interface ApiUpdateFolderRequest {
+  /**
+   * 收藏夹名称
+   * @maxLength 50
+   */
+  name: string;
+}
+
+export interface ApiUpdatePostRequest {
+  /** 帖子内容 */
+  content: string;
+  /** 媒体列表 */
+  media?: ApiCreateMediaItem[];
+  /** 标签名称 */
+  tags?: string[];
+  /**
+   * 帖子标题
+   * @maxLength 100
+   */
+  title: string;
 }
 
 export interface ApiUpdateProfileRequest {
@@ -238,6 +421,12 @@ export interface RenderResponseApiAuthResponse {
   msg?: string;
 }
 
+export interface RenderResponseApiCollectionStatusResponse {
+  code?: number;
+  data?: ApiCollectionStatusResponse;
+  msg?: string;
+}
+
 export interface RenderResponseApiCreateCommentResponse {
   code?: number;
   data?: ApiCreateCommentResponse;
@@ -250,9 +439,15 @@ export interface RenderResponseApiCreatePostResponse {
   msg?: string;
 }
 
-export interface RenderResponseApiFollowResponse {
+export interface RenderResponseApiFolderResponse {
   code?: number;
-  data?: ApiFollowResponse;
+  data?: ApiFolderResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiFollowStatusResponse {
+  code?: number;
+  data?: ApiFollowStatusResponse;
   msg?: string;
 }
 
@@ -262,9 +457,33 @@ export interface RenderResponseApiGetPostsResponse {
   msg?: string;
 }
 
-export interface RenderResponseApiToggleLikeResponse {
+export interface RenderResponseApiLikeStatusResponse {
   code?: number;
-  data?: ApiToggleLikeResponse;
+  data?: ApiLikeStatusResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiPresignMediaResponse {
+  code?: number;
+  data?: ApiPresignMediaResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiSearchResponse {
+  code?: number;
+  data?: ApiSearchResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiTagResponse {
+  code?: number;
+  data?: ApiTagResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiTopicResponse {
+  code?: number;
+  data?: ApiTopicResponse;
   msg?: string;
 }
 
@@ -274,9 +493,21 @@ export interface RenderResponseApiUserResponse {
   msg?: string;
 }
 
+export interface RenderResponseArrayApiCollectionItemResponse {
+  code?: number;
+  data?: ApiCollectionItemResponse[];
+  msg?: string;
+}
+
 export interface RenderResponseArrayApiCommentResponse {
   code?: number;
   data?: ApiCommentResponse[];
+  msg?: string;
+}
+
+export interface RenderResponseArrayApiFolderResponse {
+  code?: number;
+  data?: ApiFolderResponse[];
   msg?: string;
 }
 
@@ -292,6 +523,24 @@ export interface RenderResponseArrayApiListPostsItemResponse {
   msg?: string;
 }
 
+export interface RenderResponseArrayApiSearchHistoryResponse {
+  code?: number;
+  data?: ApiSearchHistoryResponse[];
+  msg?: string;
+}
+
+export interface RenderResponseArrayApiTopicResponse {
+  code?: number;
+  data?: ApiTopicResponse[];
+  msg?: string;
+}
+
+export interface RenderResponseArrayApiTrendingSearchResponse {
+  code?: number;
+  data?: ApiTrendingSearchResponse[];
+  msg?: string;
+}
+
 export interface RenderResponseWithoutData {
   code?: number;
   msg?: string;
@@ -301,6 +550,28 @@ export interface RenderErrorResponse {
   code?: number;
   msg?: string;
 }
+
+export type GetFeedRecommendedParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetMeCollectionsParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
 
 export type GetPostsParams = {
   /**
@@ -325,6 +596,72 @@ export type GetPostsPostIdCommentsParams = {
 };
 
 export type GetPostsUserUserIdParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetSearchParams = {
+  /**
+   * 搜索关键词
+   */
+  q: string;
+  /**
+   * 搜索类型: all/posts/users/tags
+   */
+  type?: string;
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetSearchSuggestionsParams = {
+  /**
+   * 关键词
+   */
+  q: string;
+};
+
+export type GetSearchTrendingParams = {
+  /**
+   * 数量
+   */
+  limit?: number;
+};
+
+export type GetTagsTagIdPostsParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetTopicsParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetTopicsTopicIdPostsParams = {
   /**
    * 页码
    */

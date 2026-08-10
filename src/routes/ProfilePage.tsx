@@ -3,9 +3,15 @@ import { Settings, Share2, Edit3, Grid3x3, Bookmark, Heart, MessageCircle } from
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import type { ApiUserResponse, ApiListPostsItemResponse } from "@/api/api.schemas";
+import type {
+  ApiCollectionItemResponse,
+  ApiListPostsItemResponse,
+  ApiUserResponse,
+} from "@/api/api.schemas";
+import { getAuthMe, postAuthLogin } from "@/api/auth/auth";
+import { getMeCollections } from "@/api/collections/collections";
+import { getUsersUserIdFollowers, getUsersUserIdFollowing } from "@/api/follows/follows";
 import { getPostsUserUserId } from "@/api/posts/posts";
-import { getUsersUserId, postUsersLogin } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,21 +29,34 @@ export function ProfilePage() {
   const [meId, setMeId] = useState<string | null>(() => localStorage.getItem(ME_KEY));
   const [user, setUser] = useState<ApiUserResponse | undefined>(undefined);
   const [posts, setPosts] = useState<ApiListPostsItemResponse[]>([]);
+  const [collections, setCollections] = useState<ApiCollectionItemResponse[]>([]);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [userLoading, setUserLoading] = useState(false);
 
   useEffect(() => {
     if (!meId) {
       setUser(undefined);
       setPosts([]);
+      setCollections([]);
       return;
     }
     let cancelled = false;
     setUserLoading(true);
-    Promise.all([getUsersUserId(meId), getPostsUserUserId(meId)])
-      .then(([userRes, postsRes]) => {
+    Promise.all([
+      getAuthMe(),
+      getPostsUserUserId(meId),
+      getMeCollections({ page: 1, page_size: 20 }),
+      getUsersUserIdFollowers(meId, { page: 1, page_size: 100 }),
+      getUsersUserIdFollowing(meId, { page: 1, page_size: 100 }),
+    ])
+      .then(([userRes, postsRes, collectionsRes, followersRes, followingRes]) => {
         if (cancelled) return;
         setUser(userRes.data);
         setPosts(postsRes.data ?? []);
+        setCollections(collectionsRes.data ?? []);
+        setFollowerCount(followersRes.data?.length ?? 0);
+        setFollowingCount(followingRes.data?.length ?? 0);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -54,9 +73,10 @@ export function ProfilePage() {
 
   const handleLogin = async () => {
     try {
-      const res = await postUsersLogin({ username: "demo", password: "demo123" });
+      const res = await postAuthLogin({ username: "demo", password: "demo123" });
       const auth = res.data;
-      if (auth?.token) localStorage.setItem("token", auth.token);
+      if (auth?.access_token) localStorage.setItem("access_token", auth.access_token);
+      if (auth?.refresh_token) localStorage.setItem("refresh_token", auth.refresh_token);
       if (auth?.user?.id) {
         localStorage.setItem(ME_KEY, auth.user.id);
         setMeId(auth.user.id);
@@ -121,11 +141,17 @@ export function ProfilePage() {
               </div>
 
               <div className="mt-3 flex items-center gap-5 text-sm">
-                <Stat label="关注" value={0} />
+                <Stat label="关注" value={followingCount} />
                 <Separator orientation="vertical" className="h-3" />
-                <Stat label="粉丝" value={0} />
+                <Stat label="粉丝" value={followerCount} />
                 <Separator orientation="vertical" className="h-3" />
-                <Stat label="获赞与收藏" value={0} />
+                <Stat
+                  label="获赞与收藏"
+                  value={posts.reduce(
+                    (total, post) => total + (post.like_count ?? 0) + (post.collect_count ?? 0),
+                    0,
+                  )}
+                />
               </div>
             </div>
           </div>
@@ -144,7 +170,7 @@ export function ProfilePage() {
 
           <div className="mt-3 grid grid-cols-3 gap-1 px-3">
             <StatCard Icon={Grid3x3} label="笔记" value={String((posts ?? []).length)} />
-            <StatCard Icon={Bookmark} label="收藏" value="—" />
+            <StatCard Icon={Bookmark} label="收藏" value={String(collections.length)} />
             <StatCard Icon={Heart} label="赞过" value="—" />
           </div>
 
@@ -169,7 +195,11 @@ export function ProfilePage() {
               )}
             </TabsContent>
             <TabsContent value="collections" className="mt-0">
-              <p className="text-muted-foreground py-16 text-center text-sm">暂无收藏</p>
+              {collections.length ? (
+                <MasonryFeed posts={collections} />
+              ) : (
+                <p className="text-muted-foreground py-16 text-center text-sm">暂无收藏</p>
+              )}
             </TabsContent>
             <TabsContent value="liked" className="mt-0">
               <p className="text-muted-foreground py-16 text-center text-sm">暂无赞过</p>

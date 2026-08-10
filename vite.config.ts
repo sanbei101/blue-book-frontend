@@ -19,4 +19,35 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          minSize: 20_000,
+          groups: [
+            {
+              name: "react-vendor",
+              test: /node_modules[\\/](?:react|react-dom|scheduler)(?:[\\/]|$)/,
+              priority: 40,
+            },
+            {
+              name: "router-vendor",
+              test: /node_modules[\\/]@tanstack[\\/]/,
+              priority: 30,
+            },
+            {
+              name: "ui-vendor",
+              test: /node_modules[\\/](?:@base-ui|lucide-react|class-variance-authority|clsx|tailwind-merge)(?:[\\/]|$)/,
+              priority: 20,
+            },
+            {
+              name: "vendor",
+              test: /node_modules[\\/]/,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
+  },
 });

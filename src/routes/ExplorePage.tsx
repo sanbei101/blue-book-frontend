@@ -2,8 +2,19 @@ import { Search, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import type { ApiListPostsItemResponse } from "@/api/api.schemas";
-import { getPosts } from "@/api/posts/posts";
+import type {
+  ApiListPostsItemResponse,
+  ApiSearchResponse,
+  ApiTopicResponse,
+  ApiTrendingSearchResponse,
+} from "@/api/api.schemas";
+import {
+  getFeedRecommended,
+  getSearch,
+  getSearchTrending,
+  getTopics,
+} from "@/api/discovery/discovery";
+import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,28 +23,27 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/mutator";
 
-const categories = [
-  { name: "美食", color: "from-orange-200 to-rose-200", count: "12.3w 笔记" },
-  { name: "穿搭", color: "from-pink-200 to-fuchsia-200", count: "9.8w 笔记" },
-  { name: "旅行", color: "from-sky-200 to-indigo-200", count: "8.4w 笔记" },
-  { name: "美妆", color: "from-rose-200 to-pink-200", count: "15.2w 笔记" },
-  { name: "居家", color: "from-emerald-200 to-teal-200", count: "6.7w 笔记" },
-  { name: "健身", color: "from-amber-200 to-orange-200", count: "5.1w 笔记" },
-  { name: "母婴", color: "from-violet-200 to-purple-200", count: "4.3w 笔记" },
-  { name: "数码", color: "from-slate-200 to-zinc-200", count: "3.9w 笔记" },
-];
-
 export function ExplorePage() {
   const [query, setQuery] = useState("");
   const [data, setData] = useState<ApiListPostsItemResponse[]>([]);
+  const [topics, setTopics] = useState<ApiTopicResponse[]>([]);
+  const [trending, setTrending] = useState<ApiTrendingSearchResponse[]>([]);
+  const [searchResults, setSearchResults] = useState<ApiSearchResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getPosts({ page: 1, page_size: 6 })
-      .then((res) => {
-        if (!cancelled) setData(res.data ?? []);
+    Promise.all([
+      getSearchTrending({ limit: 8 }),
+      getTopics({ page: 1, page_size: 8 }),
+      getFeedRecommended({ page: 1, page_size: 6 }),
+    ])
+      .then(([trendingRes, topicsRes, feedRes]) => {
+        if (cancelled) return;
+        setTrending(trendingRes.data ?? []);
+        setTopics(topicsRes.data ?? []);
+        setData(feedRes.data ?? []);
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError) toast.error(err.msg);
@@ -46,6 +56,36 @@ export function ExplorePage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const value = query.trim();
+    if (!value) {
+      setSearchResults(null);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      getSearch({ q: value, type: "all", page: 1, page_size: 20 })
+        .then((res) => {
+          if (!cancelled) setSearchResults(res.data ?? null);
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return;
+          if (err instanceof ApiError) toast.error(err.msg);
+          else toast.error("搜索失败");
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [query]);
 
   return (
     <>
@@ -69,14 +109,15 @@ export function ExplorePage() {
           <span>热门话题</span>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
-          {["穿搭", "美食", "旅行", "居家", "健身", "读书", "咖啡", "户外"].map((t, i) => (
+          {trending.map((item, i) => (
             <Badge
-              key={t}
+              key={item.keyword}
               variant={i < 3 ? "default" : "secondary"}
               className="cursor-pointer rounded-full px-3 py-1"
+              onClick={() => setQuery(item.keyword ?? "")}
             >
               <span className="mr-1">#{i + 1}</span>
-              {t}
+              {item.keyword}
             </Badge>
           ))}
         </div>
@@ -87,15 +128,18 @@ export function ExplorePage() {
       <div className="px-3">
         <h2 className="text-sm font-semibold">分类</h2>
         <div className="mt-2 grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          {categories.map((c) => (
+          {topics.map((topic) => (
             <Card
-              key={c.name}
-              className={c.color + " relative overflow-hidden border-0 bg-gradient-to-br ring-0"}
+              key={topic.id}
+              className="bg-muted relative cursor-pointer overflow-hidden border-0 ring-0"
+              onClick={() => setQuery(topic.name ?? "")}
             >
               <CardContent className="relative flex h-20 items-end p-3">
                 <div>
-                  <div className="text-lg font-bold text-white drop-shadow">{c.name}</div>
-                  <div className="text-[11px] text-white/90 drop-shadow">{c.count}</div>
+                  <div className="text-lg font-bold">{topic.name}</div>
+                  <div className="text-muted-foreground text-[11px]">
+                    {topic.post_count ?? 0} 笔记
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -104,39 +148,47 @@ export function ExplorePage() {
       </div>
 
       <div className="px-3 pt-4">
-        <h2 className="text-sm font-semibold">为你推荐</h2>
-        <div className="mt-2 space-y-2.5">
-          {loading
-            ? Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
-                  <Skeleton className="size-20 shrink-0 rounded-lg" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-3 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </Card>
-              ))
-            : data.slice(0, 3).map((p) => (
-                <Card key={p.id} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
-                  {p.cover_url ? (
-                    <img
-                      src={p.cover_url}
-                      alt={p.title}
-                      className="size-20 shrink-0 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="bg-muted size-20 shrink-0 rounded-lg" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium">{p.title}</p>
-                    <p className="text-muted-foreground mt-1 text-xs">{p.author?.username}</p>
-                    <p className="text-muted-foreground mt-0.5 text-[11px]">
-                      👁 {p.view_count ?? 0} 浏览
-                    </p>
-                  </div>
-                </Card>
-              ))}
-        </div>
+        <h2 className="text-sm font-semibold">{searchResults ? "搜索结果" : "为你推荐"}</h2>
+        {searchResults ? (
+          searchResults.posts?.length ? (
+            <MasonryFeed posts={searchResults.posts} />
+          ) : (
+            <p className="text-muted-foreground py-12 text-center text-sm">没有找到相关内容</p>
+          )
+        ) : (
+          <div className="mt-2 space-y-2.5">
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
+                    <Skeleton className="size-20 shrink-0 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </Card>
+                ))
+              : data.slice(0, 3).map((p) => (
+                  <Card key={p.id} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
+                    {p.cover_url ? (
+                      <img
+                        src={p.cover_url}
+                        alt={p.title}
+                        className="size-20 shrink-0 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="bg-muted size-20 shrink-0 rounded-lg" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-sm font-medium">{p.title}</p>
+                      <p className="text-muted-foreground mt-1 text-xs">{p.author?.username}</p>
+                      <p className="text-muted-foreground mt-0.5 text-[11px]">
+                        👁 {p.view_count ?? 0} 浏览
+                      </p>
+                    </div>
+                  </Card>
+                ))}
+          </div>
+        )}
       </div>
     </>
   );

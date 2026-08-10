@@ -25,18 +25,18 @@ export function TopBar({ title, showSearch = true, rightSlot, className }: TopBa
         <h1 className="text-base font-semibold tracking-wide">{title}</h1>
       ) : (
         <Link to="/" className="select-none">
-          <span className="text-xl font-bold tracking-tight text-primary">小红书</span>
+          <span className="text-primary text-xl font-bold tracking-tight">小红书</span>
         </Link>
       )}
 
       {showSearch && (
         <Link to="/explore" className="ml-2 max-w-sm flex-1 md:max-w-md">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
             <Input
               readOnly
               placeholder="搜索你感兴趣的内容"
-              className="h-8 cursor-pointer rounded-full bg-muted pl-8 text-sm"
+              className="bg-muted h-8 cursor-pointer rounded-full pl-8 text-sm"
             />
           </div>
         </Link>
@@ -47,7 +47,15 @@ export function TopBar({ title, showSearch = true, rightSlot, className }: TopBa
   );
 }
 
-export function TopBarAction({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
+export function TopBarAction({
+  to,
+  icon,
+  label,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
   return (
     <Button variant="ghost" size="icon-sm" render={<Link to={to} aria-label={label} />}>
       {icon}

@@ -1,10 +1,10 @@
 import { Bell } from "lucide-react";
 
 import { TopBar } from "@/components/layout/TopBar";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export function NotificationsPage() {
   return (
@@ -35,30 +35,30 @@ export function NotificationsPage() {
 
       <Separator className="my-3" />
 
-      <Card className="mx-3 ring-1 ring-foreground/5">
+      <Card className="ring-foreground/5 mx-3 ring-1">
         <CardContent className="flex items-center gap-3 p-3">
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div className="bg-primary/10 text-primary flex size-10 items-center justify-center rounded-full">
             <Bell className="size-4" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium">官方通知</p>
-            <p className="text-xs text-muted-foreground">活动 · 系统消息</p>
+            <p className="text-muted-foreground text-xs">活动 · 系统消息</p>
           </div>
-          <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
+          <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-[10px] font-medium">
             NEW
           </span>
         </CardContent>
       </Card>
 
       <div className="mt-6 px-3 pb-4">
-        <p className="text-xs text-muted-foreground">推荐的创作者</p>
+        <p className="text-muted-foreground text-xs">推荐的创作者</p>
         <div className="mt-3 grid grid-cols-5 gap-2">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <Avatar size="default">
                 <AvatarFallback>创</AvatarFallback>
               </Avatar>
-              <span className="line-clamp-1 text-[11px] text-muted-foreground">创作者</span>
+              <span className="text-muted-foreground line-clamp-1 text-[11px]">创作者</span>
             </div>
           ))}
         </div>
@@ -69,7 +69,7 @@ export function NotificationsPage() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
+    <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-12">
       <Avatar size="lg" className="bg-muted">
         <AvatarFallback>📭</AvatarFallback>
       </Avatar>

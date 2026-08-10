@@ -6,13 +6,7 @@ import { customInstance } from "../../mutator";
  * 小蓝书后端接口文档
  * OpenAPI spec version: 1.0
  */
-import type {
-  ApiLoginRequest,
-  ApiRegisterRequest,
-  ApiUpdateProfileRequest,
-  RenderResponseApiAuthResponse,
-  RenderResponseApiUserResponse,
-} from "../api.schemas";
+import type { ApiUpdateProfileRequest, RenderResponseApiUserResponse } from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -25,23 +19,6 @@ export const getUsersUserId = (
 ) => {
   return customInstance<RenderResponseApiUserResponse>(
     { url: `/users/${userId}`, method: "GET" },
-    options,
-  );
-};
-/**
- * @summary 用户登录
- */
-export const postUsersLogin = (
-  apiLoginRequest: ApiLoginRequest,
-  options?: SecondParameter<typeof customInstance<RenderResponseApiAuthResponse>>,
-) => {
-  return customInstance<RenderResponseApiAuthResponse>(
-    {
-      url: `/users/login`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: apiLoginRequest,
-    },
     options,
   );
 };
@@ -62,24 +39,5 @@ export const putUsersProfile = (
     options,
   );
 };
-/**
- * @summary 用户注册
- */
-export const postUsersRegister = (
-  apiRegisterRequest: ApiRegisterRequest,
-  options?: SecondParameter<typeof customInstance<RenderResponseApiAuthResponse>>,
-) => {
-  return customInstance<RenderResponseApiAuthResponse>(
-    {
-      url: `/users/register`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: apiRegisterRequest,
-    },
-    options,
-  );
-};
 export type GetUsersUserIdResult = NonNullable<Awaited<ReturnType<typeof getUsersUserId>>>;
-export type PostUsersLoginResult = NonNullable<Awaited<ReturnType<typeof postUsersLogin>>>;
 export type PutUsersProfileResult = NonNullable<Awaited<ReturnType<typeof putUsersProfile>>>;
-export type PostUsersRegisterResult = NonNullable<Awaited<ReturnType<typeof postUsersRegister>>>;

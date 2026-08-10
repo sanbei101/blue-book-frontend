@@ -1,6 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
-import { NAV_TABS } from "./nav";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +11,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import { NAV_TABS } from "./nav";
+
 export function DesktopNav() {
   const { location } = useRouterState();
 
@@ -21,7 +22,7 @@ export function DesktopNav() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link to="/" />}>
-              <span className="text-xl font-bold tracking-tight text-primary">小红书</span>
+              <span className="text-primary text-xl font-bold tracking-tight">小红书</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

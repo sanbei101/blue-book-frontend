@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import type { ApiListPostsItemResponse } from "@/api/api.schemas";
-import { getPosts } from "@/api/posts/posts";
+import { getSearch, getFeedRecommended } from "@/api/discovery/discovery";
 import { CategoryTabs } from "@/components/feed/CategoryTabs";
 import { MasonryFeed, MasonryFeedSkeleton } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
@@ -16,9 +16,15 @@ export function HomePage() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getPosts({ page: 1, page_size: 20 })
+    const request =
+      category === "推荐"
+        ? getFeedRecommended({ page: 1, page_size: 20 })
+        : getSearch({ q: category, type: "posts", page: 1, page_size: 20 });
+    request
       .then((res) => {
-        if (!cancelled) setPosts(res.data ?? []);
+        if (cancelled) return;
+        if (Array.isArray(res.data)) setPosts(res.data);
+        else setPosts(res.data?.posts ?? []);
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError) toast.error(err.msg);

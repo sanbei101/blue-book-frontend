@@ -6,25 +6,65 @@ import { customInstance } from "../../mutator";
  * 小蓝书后端接口文档
  * OpenAPI spec version: 1.0
  */
-import type { ApiToggleLikeRequest, RenderResponseApiToggleLikeResponse } from "../api.schemas";
+import type { RenderResponseApiLikeStatusResponse } from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * @summary 切换点赞状态
+ * @summary 取消点赞评论
  */
-export const postLikes = (
-  apiToggleLikeRequest: ApiToggleLikeRequest,
-  options?: SecondParameter<typeof customInstance<RenderResponseApiToggleLikeResponse>>,
+export const deleteCommentsCommentIdLike = (
+  commentId: string,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiLikeStatusResponse>>,
 ) => {
-  return customInstance<RenderResponseApiToggleLikeResponse>(
-    {
-      url: `/likes`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: apiToggleLikeRequest,
-    },
+  return customInstance<RenderResponseApiLikeStatusResponse>(
+    { url: `/comments/${commentId}/like`, method: "DELETE" },
     options,
   );
 };
-export type PostLikesResult = NonNullable<Awaited<ReturnType<typeof postLikes>>>;
+/**
+ * @summary 点赞评论
+ */
+export const putCommentsCommentIdLike = (
+  commentId: string,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiLikeStatusResponse>>,
+) => {
+  return customInstance<RenderResponseApiLikeStatusResponse>(
+    { url: `/comments/${commentId}/like`, method: "PUT" },
+    options,
+  );
+};
+/**
+ * @summary 取消点赞帖子
+ */
+export const deletePostsPostIdLike = (
+  postId: string,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiLikeStatusResponse>>,
+) => {
+  return customInstance<RenderResponseApiLikeStatusResponse>(
+    { url: `/posts/${postId}/like`, method: "DELETE" },
+    options,
+  );
+};
+/**
+ * @summary 点赞帖子
+ */
+export const putPostsPostIdLike = (
+  postId: string,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiLikeStatusResponse>>,
+) => {
+  return customInstance<RenderResponseApiLikeStatusResponse>(
+    { url: `/posts/${postId}/like`, method: "PUT" },
+    options,
+  );
+};
+export type DeleteCommentsCommentIdLikeResult = NonNullable<
+  Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>
+>;
+export type PutCommentsCommentIdLikeResult = NonNullable<
+  Awaited<ReturnType<typeof putCommentsCommentIdLike>>
+>;
+export type DeletePostsPostIdLikeResult = NonNullable<
+  Awaited<ReturnType<typeof deletePostsPostIdLike>>
+>;
+export type PutPostsPostIdLikeResult = NonNullable<Awaited<ReturnType<typeof putPostsPostIdLike>>>;

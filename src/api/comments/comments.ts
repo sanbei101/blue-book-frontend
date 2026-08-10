@@ -11,6 +11,7 @@ import type {
   GetPostsPostIdCommentsParams,
   RenderResponseApiCreateCommentResponse,
   RenderResponseArrayApiCommentResponse,
+  RenderResponseWithoutData,
 } from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -33,6 +34,18 @@ export const postComments = (
   );
 };
 /**
+ * @summary 删除评论
+ */
+export const deleteCommentsCommentId = (
+  commentId: string,
+  options?: SecondParameter<typeof customInstance<RenderResponseWithoutData>>,
+) => {
+  return customInstance<RenderResponseWithoutData>(
+    { url: `/comments/${commentId}`, method: "DELETE" },
+    options,
+  );
+};
+/**
  * @summary 获取帖子评论列表
  */
 export const getPostsPostIdComments = (
@@ -46,6 +59,9 @@ export const getPostsPostIdComments = (
   );
 };
 export type PostCommentsResult = NonNullable<Awaited<ReturnType<typeof postComments>>>;
+export type DeleteCommentsCommentIdResult = NonNullable<
+  Awaited<ReturnType<typeof deleteCommentsCommentId>>
+>;
 export type GetPostsPostIdCommentsResult = NonNullable<
   Awaited<ReturnType<typeof getPostsPostIdComments>>
 >;

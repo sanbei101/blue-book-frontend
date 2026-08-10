@@ -12,7 +12,12 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import type { ApiUserResponse, ApiListPostsItemResponse } from "@/api/api.schemas";
-import { postUsersUserIdFollow, deleteUsersUserIdFollow } from "@/api/follows/follows";
+import {
+  deleteUsersUserIdFollow,
+  getUsersUserIdFollowers,
+  getUsersUserIdFollowing,
+  putUsersUserIdFollow,
+} from "@/api/follows/follows";
 import { getPostsUserUserId } from "@/api/posts/posts";
 import { getUsersUserId } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
@@ -28,16 +33,25 @@ export function UserProfilePage({ userId }: { userId: string }) {
   const [following, setFollowing] = useState(false);
   const [user, setUser] = useState<ApiUserResponse | undefined>(undefined);
   const [posts, setPosts] = useState<ApiListPostsItemResponse[]>([]);
+  const [followerCount, setFollowerCount] = useState<number | undefined>(undefined);
+  const [followingCount, setFollowingCount] = useState<number | undefined>(undefined);
   const [userLoading, setUserLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setUserLoading(true);
-    Promise.all([getUsersUserId(userId), getPostsUserUserId(userId)])
-      .then(([userRes, postsRes]) => {
+    Promise.all([
+      getUsersUserId(userId),
+      getPostsUserUserId(userId),
+      getUsersUserIdFollowers(userId, { page: 1, page_size: 100 }),
+      getUsersUserIdFollowing(userId, { page: 1, page_size: 100 }),
+    ])
+      .then(([userRes, postsRes, followersRes, followingRes]) => {
         if (cancelled) return;
         setUser(userRes.data);
         setPosts(postsRes.data ?? []);
+        setFollowerCount(followersRes.data?.length ?? 0);
+        setFollowingCount(followingRes.data?.length ?? 0);
       })
       .catch(() => {
         if (!cancelled) setUser(undefined);
@@ -54,8 +68,11 @@ export function UserProfilePage({ userId }: { userId: string }) {
     const next = !following;
     setFollowing(next);
     try {
-      if (next) await postUsersUserIdFollow(userId);
-      else await deleteUsersUserIdFollow(userId);
+      const response = next
+        ? await putUsersUserIdFollow(userId)
+        : await deleteUsersUserIdFollow(userId);
+      setFollowing(response.data?.following ?? next);
+      setFollowerCount(response.data?.follower_count ?? followerCount);
       toast.success(next ? "已关注" : "已取消关注");
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
@@ -111,15 +128,15 @@ export function UserProfilePage({ userId }: { userId: string }) {
             <p className="text-muted-foreground mt-0.5 text-xs">小红书号: {user.id}</p>
             <div className="mt-2 flex items-center gap-4 text-sm">
               <span>
-                <span className="font-semibold">{formatCount(0)}</span>{" "}
+                <span className="font-semibold">{formatCount(posts.length)}</span>{" "}
                 <span className="text-muted-foreground text-xs">笔记</span>
               </span>
               <span>
-                <span className="font-semibold">{formatCount(0)}</span>{" "}
+                <span className="font-semibold">{formatCount(followerCount)}</span>{" "}
                 <span className="text-muted-foreground text-xs">粉丝</span>
               </span>
               <span>
-                <span className="font-semibold">{formatCount(0)}</span>{" "}
+                <span className="font-semibold">{formatCount(followingCount)}</span>{" "}
                 <span className="text-muted-foreground text-xs">关注</span>
               </span>
             </div>

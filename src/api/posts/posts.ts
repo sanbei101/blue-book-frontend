@@ -8,6 +8,7 @@ import { customInstance } from "../../mutator";
  */
 import type {
   ApiCreatePostRequest,
+  ApiUpdatePostRequest,
   GetPostsParams,
   GetPostsUserUserIdParams,
   RenderResponseApiCreatePostResponse,
@@ -72,6 +73,24 @@ export const getPostsPostId = (
   );
 };
 /**
+ * @summary 编辑帖子
+ */
+export const patchPostsPostId = (
+  postId: string,
+  apiUpdatePostRequest: ApiUpdatePostRequest,
+  options?: SecondParameter<typeof customInstance<RenderResponseApiCreatePostResponse>>,
+) => {
+  return customInstance<RenderResponseApiCreatePostResponse>(
+    {
+      url: `/posts/${postId}`,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      data: apiUpdatePostRequest,
+    },
+    options,
+  );
+};
+/**
  * @summary 获取指定用户的帖子列表
  */
 export const getPostsUserUserId = (
@@ -88,4 +107,5 @@ export type GetPostsResult = NonNullable<Awaited<ReturnType<typeof getPosts>>>;
 export type PostPostsResult = NonNullable<Awaited<ReturnType<typeof postPosts>>>;
 export type DeletePostsPostIdResult = NonNullable<Awaited<ReturnType<typeof deletePostsPostId>>>;
 export type GetPostsPostIdResult = NonNullable<Awaited<ReturnType<typeof getPostsPostId>>>;
+export type PatchPostsPostIdResult = NonNullable<Awaited<ReturnType<typeof patchPostsPostId>>>;
 export type GetPostsUserUserIdResult = NonNullable<Awaited<ReturnType<typeof getPostsUserUserId>>>;

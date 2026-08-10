@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
-import { NAV_TABS } from "./nav";
 import { cn } from "@/lib/utils";
+
+import { NAV_TABS } from "./nav";
 
 export function BottomNav({ className }: { className?: string }) {
   const { location } = useRouterState();
@@ -26,7 +27,7 @@ export function BottomNav({ className }: { className?: string }) {
               to={tab.to}
               className="relative flex flex-1 flex-col items-center justify-center"
             >
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md transition-transform active:scale-95">
+              <span className="bg-primary text-primary-foreground flex size-12 items-center justify-center rounded-2xl shadow-md transition-transform active:scale-95">
                 <svg
                   width="22"
                   height="22"

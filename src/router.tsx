@@ -1,21 +1,16 @@
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-} from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/layout/AppShell";
 
-import { HomePage } from "./routes/HomePage";
 import { ExplorePage } from "./routes/ExplorePage";
-import { PublishPage } from "./routes/PublishPage";
-import { NotificationsPage } from "./routes/NotificationsPage";
-import { ProfilePage } from "./routes/ProfilePage";
-import { UserProfilePage } from "./routes/UserProfilePage";
-import { PostDetailPage } from "./routes/PostDetailPage";
+import { HomePage } from "./routes/HomePage";
 import { NotFoundPage } from "./routes/NotFoundPage";
+import { NotificationsPage } from "./routes/NotificationsPage";
+import { PostDetailPage } from "./routes/PostDetailPage";
+import { ProfilePage } from "./routes/ProfilePage";
+import { PublishPage } from "./routes/PublishPage";
 import { RouteError } from "./routes/RouteError";
+import { UserProfilePage } from "./routes/UserProfilePage";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -80,13 +75,7 @@ const postDetailRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  shellRoute.addChildren([
-    indexRoute,
-    exploreRoute,
-    publishRoute,
-    notificationsRoute,
-    meRoute,
-  ]),
+  shellRoute.addChildren([indexRoute, exploreRoute, publishRoute, notificationsRoute, meRoute]),
   userProfileRoute,
   postDetailRoute,
 ]);
