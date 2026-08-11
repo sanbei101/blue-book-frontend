@@ -26,9 +26,9 @@ import type {
   ApiCreateCommentRequest,
   GetPostsPostIdCommentsParams,
   RenderErrorResponse,
-  RenderResponseApiCreateCommentResponse,
-  RenderResponseArrayApiCommentResponse,
-  RenderResponseWithoutData,
+  RenderResponseApiCommentResponse,
+  RenderResponseApiDeleteCommentResponse,
+  RenderResponseApiPageResponseApiCommentResponse,
 } from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -56,7 +56,7 @@ export const postComments = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseApiCreateCommentResponse>(
+  return customInstance<RenderResponseApiCommentResponse>(
     {
       url: `/comments`,
       method: "POST",
@@ -138,7 +138,7 @@ export const deleteCommentsCommentId = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseWithoutData>(
+  return customInstance<RenderResponseApiDeleteCommentResponse>(
     { url: `/comments/${commentId}`, method: "DELETE", signal },
     options,
   );
@@ -217,7 +217,7 @@ export const getPostsPostIdComments = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiCommentResponse>(
+  return customInstance<RenderResponseApiPageResponseApiCommentResponse>(
     { url: `/posts/${postId}/comments`, method: "GET", params, signal },
     options,
   );

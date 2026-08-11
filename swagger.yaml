@@ -12,7 +12,7 @@ components:
           description: Refresh token
           type: string
         user:
-          $ref: "#/components/schemas/api.userResponse"
+          $ref: '#/components/schemas/api.userResponse'
       type: object
     api.authorResponse:
       description: 作者信息
@@ -26,6 +26,12 @@ components:
         username:
           description: 用户名
           type: string
+        viewer_following:
+          description: 当前用户是否已关注作者
+          type: boolean
+      required:
+      - id
+      - viewer_following
       type: object
     api.changePasswordRequest:
       properties:
@@ -38,8 +44,8 @@ components:
           description: 当前密码
           type: string
       required:
-        - new_password
-        - old_password
+      - new_password
+      - old_password
       type: object
     api.collectPostRequest:
       properties:
@@ -47,46 +53,18 @@ components:
           description: 收藏夹 ID,可选
           type: string
       type: object
-    api.collectionItemResponse:
-      properties:
-        author:
-          $ref: "#/components/schemas/api.authorResponse"
-        collect_count:
-          description: 收藏数
-          type: integer
-        collected_at:
-          description: 收藏时间
-          type: string
-        comment_count:
-          description: 评论数
-          type: integer
-        content:
-          description: 内容
-          type: string
-        cover_url:
-          description: 封面 URL
-          type: string
-        id:
-          description: 帖子 ID
-          type: string
-        like_count:
-          description: 点赞数
-          type: integer
-        title:
-          description: 标题
-          type: string
-        view_count:
-          description: 浏览量
-          type: integer
-      type: object
     api.collectionStatusResponse:
       properties:
         collect_count:
           description: 收藏数量
+          minimum: 0
           type: integer
-        collected:
+        viewer_collected:
           description: 是否已收藏
           type: boolean
+      required:
+      - collect_count
+      - viewer_collected
       type: object
     api.commentResponse:
       properties:
@@ -107,6 +85,7 @@ components:
           type: string
         like_count:
           description: 点赞数
+          minimum: 0
           type: integer
         parent_id:
           description: 父评论 ID,顶级评论为 nil
@@ -117,6 +96,15 @@ components:
         user_id:
           description: 用户 ID
           type: string
+        viewer_liked:
+          description: 当前用户是否已点赞
+          type: boolean
+      required:
+      - id
+      - like_count
+      - post_id
+      - user_id
+      - viewer_liked
       type: object
     api.createCommentRequest:
       properties:
@@ -131,14 +119,8 @@ components:
           description: 帖子唯一标识 ID
           type: string
       required:
-        - content
-        - post_id
-      type: object
-    api.createCommentResponse:
-      properties:
-        id:
-          description: 评论 ID
-          type: string
+      - content
+      - post_id
       type: object
     api.createFolderRequest:
       properties:
@@ -147,25 +129,25 @@ components:
           maxLength: 50
           type: string
       required:
-        - name
+      - name
       type: object
     api.createMediaItem:
       properties:
+        media_key:
+          description: 媒体对象 key
+          type: string
         media_type:
           description: 媒体类型 (image/video)
           enum:
-            - image
-            - video
-          type: string
-        media_url:
-          description: 媒体 URL
+          - image
+          - video
           type: string
         sort_order:
           description: 排序序号
           type: integer
       required:
-        - media_type
-        - media_url
+      - media_key
+      - media_type
       type: object
     api.createPostRequest:
       properties:
@@ -175,7 +157,7 @@ components:
         media:
           description: 媒体列表
           items:
-            $ref: "#/components/schemas/api.createMediaItem"
+            $ref: '#/components/schemas/api.createMediaItem'
           type: array
           uniqueItems: false
         tags:
@@ -189,8 +171,8 @@ components:
           maxLength: 100
           type: string
       required:
-        - content
-        - title
+      - content
+      - title
       type: object
     api.createPostResponse:
       properties:
@@ -209,7 +191,21 @@ components:
           maxLength: 50
           type: string
       required:
-        - name
+      - name
+      type: object
+    api.deleteCommentResponse:
+      properties:
+        comment_count:
+          minimum: 0
+          type: integer
+        id:
+          type: string
+        post_id:
+          type: string
+      required:
+      - comment_count
+      - id
+      - post_id
       type: object
     api.folderResponse:
       properties:
@@ -227,10 +223,14 @@ components:
       properties:
         follower_count:
           description: 该用户粉丝数
+          minimum: 0
           type: integer
-        following:
+        viewer_following:
           description: 是否已关注
           type: boolean
+      required:
+      - follower_count
+      - viewer_following
       type: object
     api.followUserResponse:
       properties:
@@ -246,19 +246,24 @@ components:
         username:
           description: 用户名
           type: string
+        viewer_following:
+          description: 当前用户是否已关注
+          type: boolean
+      required:
+      - id
+      - viewer_following
       type: object
     api.getPostsResponse:
       properties:
         author:
-          $ref: "#/components/schemas/api.authorResponse"
+          $ref: '#/components/schemas/api.authorResponse'
         collect_count:
           description: 收藏数
+          minimum: 0
           type: integer
-        collected:
-          description: 当前用户是否已收藏
-          type: boolean
         comment_count:
           description: 评论数
+          minimum: 0
           type: integer
         content:
           description: 内容
@@ -271,20 +276,18 @@ components:
           type: string
         like_count:
           description: 点赞数
+          minimum: 0
           type: integer
-        liked:
-          description: 当前用户是否已点赞
-          type: boolean
         media:
           description: 媒体列表
           items:
-            $ref: "#/components/schemas/api.mediaResponse"
+            $ref: '#/components/schemas/api.mediaResponse'
           type: array
           uniqueItems: false
         tags:
           description: 标签列表
           items:
-            $ref: "#/components/schemas/api.tagResponse"
+            $ref: '#/components/schemas/api.tagResponse'
           type: array
           uniqueItems: false
         title:
@@ -292,26 +295,47 @@ components:
           type: string
         view_count:
           description: 浏览量
+          minimum: 0
           type: integer
+        viewer_collected:
+          description: 当前用户是否已收藏
+          type: boolean
+        viewer_liked:
+          description: 当前用户是否已点赞
+          type: boolean
+      required:
+      - collect_count
+      - comment_count
+      - id
+      - like_count
+      - view_count
+      - viewer_collected
+      - viewer_liked
       type: object
     api.likeStatusResponse:
       properties:
         like_count:
           description: 点赞数量
+          minimum: 0
           type: integer
-        liked:
+        viewer_liked:
           description: 是否已点赞
           type: boolean
+      required:
+      - like_count
+      - viewer_liked
       type: object
     api.listPostsItemResponse:
       properties:
         author:
-          $ref: "#/components/schemas/api.authorResponse"
+          $ref: '#/components/schemas/api.authorResponse'
         collect_count:
           description: 收藏数
+          minimum: 0
           type: integer
         comment_count:
           description: 评论数
+          minimum: 0
           type: integer
         content:
           description: 内容
@@ -327,13 +351,29 @@ components:
           type: string
         like_count:
           description: 点赞数
+          minimum: 0
           type: integer
         title:
           description: 标题
           type: string
         view_count:
           description: 浏览量
+          minimum: 0
           type: integer
+        viewer_collected:
+          description: 当前用户是否已收藏
+          type: boolean
+        viewer_liked:
+          description: 当前用户是否已点赞
+          type: boolean
+      required:
+      - collect_count
+      - comment_count
+      - id
+      - like_count
+      - view_count
+      - viewer_collected
+      - viewer_liked
       type: object
     api.loginRequest:
       properties:
@@ -344,11 +384,14 @@ components:
           description: 用户名
           type: string
       required:
-        - password
-        - username
+      - password
+      - username
       type: object
     api.mediaResponse:
       properties:
+        height:
+          description: 图片高度
+          type: integer
         id:
           description: 媒体 ID
           type: string
@@ -356,11 +399,190 @@ components:
           description: 媒体类型
           type: string
         media_url:
-          description: 媒体 URL
+          description: 媒体 CDN URL
           type: string
         sort_order:
           description: 排序序号
           type: integer
+        width:
+          description: 图片宽度
+          type: integer
+      type: object
+    api.pageResponse-api_commentResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.commentResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_folderResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.folderResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_followUserResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.followUserResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_listPostsItemResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.listPostsItemResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_searchHistoryResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.searchHistoryResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_tagResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.tagResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_topicResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.topicResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
+      type: object
+    api.pageResponse-api_trendingSearchResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/api.trendingSearchResponse'
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+      - items
+      - page
+      - page_size
+      - total
       type: object
     api.presignMediaRequest:
       properties:
@@ -368,7 +590,7 @@ components:
           description: 文件 MIME 类型
           type: string
       required:
-        - content_type
+      - content_type
       type: object
     api.presignMediaResponse:
       properties:
@@ -387,7 +609,7 @@ components:
         refresh_token:
           type: string
       required:
-        - refresh_token
+      - refresh_token
       type: object
     api.registerRequest:
       properties:
@@ -402,8 +624,8 @@ components:
           minLength: 3
           type: string
       required:
-        - password
-        - username
+      - password
+      - username
       type: object
     api.searchHistoryResponse:
       properties:
@@ -412,48 +634,14 @@ components:
         searched_at:
           type: string
       type: object
-    api.searchPostResponse:
-      properties:
-        author:
-          $ref: "#/components/schemas/api.authorResponse"
-        collect_count:
-          type: integer
-        comment_count:
-          type: integer
-        content:
-          type: string
-        cover_url:
-          type: string
-        created_at:
-          type: string
-        id:
-          type: string
-        like_count:
-          type: integer
-        relevance:
-          type: number
-        title:
-          type: string
-        view_count:
-          type: integer
-      type: object
     api.searchResponse:
       properties:
         posts:
-          items:
-            $ref: "#/components/schemas/api.searchPostResponse"
-          type: array
-          uniqueItems: false
+          $ref: '#/components/schemas/api.pageResponse-api_listPostsItemResponse'
         tags:
-          items:
-            $ref: "#/components/schemas/api.tagResponse"
-          type: array
-          uniqueItems: false
+          $ref: '#/components/schemas/api.pageResponse-api_tagResponse'
         users:
-          items:
-            $ref: "#/components/schemas/api.followUserResponse"
-          type: array
-          uniqueItems: false
+          $ref: '#/components/schemas/api.pageResponse-api_followUserResponse'
       type: object
     api.tagResponse:
       properties:
@@ -508,7 +696,7 @@ components:
           maxLength: 50
           type: string
       required:
-        - name
+      - name
       type: object
     api.updatePostRequest:
       properties:
@@ -518,7 +706,7 @@ components:
         media:
           description: 媒体列表
           items:
-            $ref: "#/components/schemas/api.createMediaItem"
+            $ref: '#/components/schemas/api.createMediaItem'
           type: array
           uniqueItems: false
         tags:
@@ -532,8 +720,8 @@ components:
           maxLength: 100
           type: string
       required:
-        - content
-        - title
+      - content
+      - title
       type: object
     api.updateProfileRequest:
       properties:
@@ -550,7 +738,42 @@ components:
           minLength: 3
           type: string
       required:
-        - username
+      - username
+      type: object
+    api.userProfileResponse:
+      properties:
+        avatar_url:
+          type: string
+        bio:
+          type: string
+        follower_count:
+          minimum: 0
+          type: integer
+        following_count:
+          minimum: 0
+          type: integer
+        id:
+          type: string
+        post_count:
+          minimum: 0
+          type: integer
+        received_like_and_collect_count:
+          minimum: 0
+          type: integer
+        username:
+          type: string
+        viewer_following:
+          type: boolean
+      required:
+      - avatar_url
+      - bio
+      - follower_count
+      - following_count
+      - id
+      - post_count
+      - received_like_and_collect_count
+      - username
+      - viewer_following
       type: object
     api.userResponse:
       description: 用户信息
@@ -573,7 +796,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.authResponse"
+          $ref: '#/components/schemas/api.authResponse'
         msg:
           type: string
       type: object
@@ -582,16 +805,16 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.collectionStatusResponse"
+          $ref: '#/components/schemas/api.collectionStatusResponse'
         msg:
           type: string
       type: object
-    render.Response-api_createCommentResponse:
+    render.Response-api_commentResponse:
       properties:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.createCommentResponse"
+          $ref: '#/components/schemas/api.commentResponse'
         msg:
           type: string
       type: object
@@ -600,7 +823,16 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.createPostResponse"
+          $ref: '#/components/schemas/api.createPostResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_deleteCommentResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.deleteCommentResponse'
         msg:
           type: string
       type: object
@@ -609,7 +841,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.folderResponse"
+          $ref: '#/components/schemas/api.folderResponse'
         msg:
           type: string
       type: object
@@ -618,7 +850,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.followStatusResponse"
+          $ref: '#/components/schemas/api.followStatusResponse'
         msg:
           type: string
       type: object
@@ -627,7 +859,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.getPostsResponse"
+          $ref: '#/components/schemas/api.getPostsResponse'
         msg:
           type: string
       type: object
@@ -636,7 +868,70 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.likeStatusResponse"
+          $ref: '#/components/schemas/api.likeStatusResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_commentResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_commentResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_folderResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_folderResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_followUserResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_followUserResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_listPostsItemResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_listPostsItemResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_searchHistoryResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_searchHistoryResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_topicResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_topicResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_pageResponse-api_trendingSearchResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.pageResponse-api_trendingSearchResponse'
         msg:
           type: string
       type: object
@@ -645,7 +940,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.presignMediaResponse"
+          $ref: '#/components/schemas/api.presignMediaResponse'
         msg:
           type: string
       type: object
@@ -654,7 +949,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.searchResponse"
+          $ref: '#/components/schemas/api.searchResponse'
         msg:
           type: string
       type: object
@@ -663,7 +958,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.tagResponse"
+          $ref: '#/components/schemas/api.tagResponse'
         msg:
           type: string
       type: object
@@ -672,7 +967,16 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.topicResponse"
+          $ref: '#/components/schemas/api.topicResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_userProfileResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.userProfileResponse'
         msg:
           type: string
       type: object
@@ -681,103 +985,7 @@ components:
         code:
           type: integer
         data:
-          $ref: "#/components/schemas/api.userResponse"
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_collectionItemResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.collectionItemResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_commentResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.commentResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_folderResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.folderResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_followUserResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.followUserResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_listPostsItemResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.listPostsItemResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_searchHistoryResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.searchHistoryResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_topicResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.topicResponse"
-          type: array
-          uniqueItems: false
-        msg:
-          type: string
-      type: object
-    render.Response-array_api_trendingSearchResponse:
-      properties:
-        code:
-          type: integer
-        data:
-          items:
-            $ref: "#/components/schemas/api.trendingSearchResponse"
-          type: array
-          uniqueItems: false
+          $ref: '#/components/schemas/api.userResponse'
         msg:
           type: string
       type: object
@@ -814,7 +1022,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.loginRequest"
+              $ref: '#/components/schemas/api.loginRequest'
               description: 登录信息
               summary: body
         description: 登录信息
@@ -824,23 +1032,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_authResponse"
+                $ref: '#/components/schemas/render.Response-api_authResponse'
           description: OK
         "401":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Unauthorized
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 用户登录
       tags:
-        - auth
+      - auth
   /auth/logout:
     post:
       responses:
@@ -848,19 +1056,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 退出登录
       tags:
-        - auth
+      - auth
   /auth/me:
     get:
       responses:
@@ -868,26 +1076,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_userResponse"
+                $ref: '#/components/schemas/render.Response-api_userResponse'
           description: OK
         "401":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Unauthorized
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 获取当前登录用户
       tags:
-        - auth
+      - auth
   /auth/password:
     put:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.changePasswordRequest"
+              $ref: '#/components/schemas/api.changePasswordRequest'
               description: 密码信息
               summary: body
         description: 密码信息
@@ -897,38 +1105,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "401":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Unauthorized
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 修改密码
       tags:
-        - auth
+      - auth
   /auth/refresh:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.refreshTokenRequest"
+              $ref: '#/components/schemas/api.refreshTokenRequest'
               description: 刷新凭证
               summary: body
         description: 刷新凭证
@@ -938,30 +1146,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_authResponse"
+                $ref: '#/components/schemas/render.Response-api_authResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "401":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Unauthorized
       summary: 刷新登录凭证
       tags:
-        - auth
+      - auth
   /auth/register:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.registerRequest"
+              $ref: '#/components/schemas/api.registerRequest'
               description: 注册信息
               summary: body
         description: 注册信息
@@ -971,30 +1179,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_authResponse"
+                $ref: '#/components/schemas/render.Response-api_authResponse'
           description: OK
         "409":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Conflict
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 用户注册
       tags:
-        - auth
+      - auth
   /comments:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.createCommentRequest"
+              $ref: '#/components/schemas/api.createCommentRequest'
               description: 评论内容
               summary: body
         description: 评论内容
@@ -1004,237 +1212,250 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_createCommentResponse"
+                $ref: '#/components/schemas/render.Response-api_commentResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 创建评论
       tags:
-        - comments
+      - comments
   /comments/{comment_id}:
     delete:
       parameters:
-        - description: 评论 ID
-          in: path
-          name: comment_id
-          required: true
-          schema:
-            type: string
+      - description: 评论 ID
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          type: string
       responses:
-        "204":
+        "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
-          description: No Content
+                $ref: '#/components/schemas/render.Response-api_deleteCommentResponse'
+          description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "403":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Forbidden
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 删除评论
       tags:
-        - comments
+      - comments
   /comments/{comment_id}/like:
     delete:
       parameters:
-        - description: 评论 ID
-          in: path
-          name: comment_id
-          required: true
-          schema:
-            type: string
+      - description: 评论 ID
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_likeStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_likeStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 取消点赞评论
       tags:
-        - likes
+      - likes
     put:
       parameters:
-        - description: 评论 ID
-          in: path
-          name: comment_id
-          required: true
-          schema:
-            type: string
+      - description: 评论 ID
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_likeStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_likeStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 点赞评论
       tags:
-        - likes
+      - likes
   /feed/recommended:
     get:
       parameters:
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_listPostsItemResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取发现流
       tags:
-        - discovery
+      - discovery
   /me/collections:
     get:
       parameters:
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_collectionItemResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 获取我的收藏列表
       tags:
-        - collections
+      - collections
   /me/collections/folders:
     get:
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_folderResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_folderResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 获取收藏夹列表
       tags:
-        - collections
+      - collections
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.createFolderRequest"
+              $ref: '#/components/schemas/api.createFolderRequest'
               description: 收藏夹信息
               summary: body
         description: 收藏夹信息
@@ -1244,83 +1465,83 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_folderResponse"
+                $ref: '#/components/schemas/render.Response-api_folderResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "409":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Conflict
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 创建收藏夹
       tags:
-        - collections
+      - collections
   /me/collections/folders/{folder_id}:
     delete:
       parameters:
-        - description: 收藏夹 ID
-          in: path
-          name: folder_id
-          required: true
-          schema:
-            type: string
+      - description: 收藏夹 ID
+        in: path
+        name: folder_id
+        required: true
+        schema:
+          type: string
       responses:
         "204":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 删除收藏夹
       tags:
-        - collections
+      - collections
     patch:
       parameters:
-        - description: 收藏夹 ID
-          in: path
-          name: folder_id
-          required: true
-          schema:
-            type: string
+      - description: 收藏夹 ID
+        in: path
+        name: folder_id
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.updateFolderRequest"
+              $ref: '#/components/schemas/api.updateFolderRequest'
               description: 收藏夹信息
               summary: body
         description: 收藏夹信息
@@ -1330,31 +1551,57 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_folderResponse"
+                $ref: '#/components/schemas/render.Response-api_folderResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 修改收藏夹
       tags:
-        - collections
+      - collections
+  /me/profile:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_userProfileResponse'
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: 获取当前用户资料
+      tags:
+      - users
   /me/search-history:
     delete:
       responses:
@@ -1362,45 +1609,58 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 清空搜索历史
       tags:
-        - discovery
+      - discovery
     get:
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_searchHistoryResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_searchHistoryResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 获取搜索历史
       tags:
-        - discovery
+      - discovery
   /media/presign:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.presignMediaRequest"
+              $ref: '#/components/schemas/api.presignMediaRequest'
               description: 媒体信息
               summary: body
         description: 媒体信息
@@ -1410,68 +1670,68 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_presignMediaResponse"
+                $ref: '#/components/schemas/render.Response-api_presignMediaResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
         "503":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Service Unavailable
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 获取媒体上传地址
       tags:
-        - media
+      - media
   /posts:
     get:
       parameters:
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_listPostsItemResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取帖子列表
       tags:
-        - posts
+      - posts
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.createPostRequest"
+              $ref: '#/components/schemas/api.createPostRequest'
               description: 帖子内容
               summary: body
         description: 帖子内容
@@ -1481,101 +1741,101 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_createPostResponse"
+                $ref: '#/components/schemas/render.Response-api_createPostResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 创建帖子
       tags:
-        - posts
+      - posts
   /posts/{post_id}:
     delete:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       responses:
         "204":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.ResponseWithoutData"
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 删除帖子
       tags:
-        - posts
+      - posts
     get:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_getPostsResponse"
+                $ref: '#/components/schemas/render.Response-api_getPostsResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
       summary: 获取帖子详情
       tags:
-        - posts
+      - posts
     patch:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.updatePostRequest"
+              $ref: '#/components/schemas/api.updatePostRequest'
               description: 更新内容
               summary: body
         description: 更新内容
@@ -1585,89 +1845,89 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_createPostResponse"
+                $ref: '#/components/schemas/render.Response-api_createPostResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "403":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Forbidden
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 编辑帖子
       tags:
-        - posts
+      - posts
   /posts/{post_id}/collection:
     delete:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_collectionStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_collectionStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 取消收藏帖子
       tags:
-        - collections
+      - collections
     put:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.collectPostRequest"
+              $ref: '#/components/schemas/api.collectPostRequest'
               description: 收藏夹
               summary: body
         description: 收藏夹
@@ -1676,299 +1936,262 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_collectionStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_collectionStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 收藏帖子
       tags:
-        - collections
+      - collections
   /posts/{post_id}/comments:
     get:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_commentResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_commentResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取帖子评论列表
       tags:
-        - comments
+      - comments
   /posts/{post_id}/like:
     delete:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_likeStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_likeStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 取消点赞帖子
       tags:
-        - likes
+      - likes
     put:
       parameters:
-        - description: 帖子 ID
-          in: path
-          name: post_id
-          required: true
-          schema:
-            type: string
+      - description: 帖子 ID
+        in: path
+        name: post_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_likeStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_likeStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 点赞帖子
       tags:
-        - likes
-  /posts/user/{user_id}:
-    get:
-      parameters:
-        - description: 用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/render.Response-array_api_listPostsItemResponse"
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/render.errorResponse"
-          description: Bad Request
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/render.errorResponse"
-          description: Internal Server Error
-      summary: 获取指定用户的帖子列表
-      tags:
-        - posts
+      - likes
   /search:
     get:
       parameters:
-        - description: 搜索关键词
-          in: query
-          name: q
-          required: true
-          schema:
-            type: string
-        - description: "搜索类型: all/posts/users/tags"
-          in: query
-          name: type
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 搜索关键词
+        in: query
+        name: q
+        required: true
+        schema:
+          type: string
+      - description: '搜索类型: all/posts/users/tags'
+        in: query
+        name: type
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_searchResponse"
+                $ref: '#/components/schemas/render.Response-api_searchResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 综合搜索
       tags:
-        - discovery
+      - discovery
   /search/suggestions:
     get:
       parameters:
-        - description: 关键词
-          in: query
-          name: q
-          required: true
-          schema:
-            type: string
+      - description: 关键词
+        in: query
+        name: q
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_searchResponse"
+                $ref: '#/components/schemas/render.Response-api_searchResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 搜索联想
       tags:
-        - discovery
+      - discovery
   /search/trending:
     get:
       parameters:
-        - description: 数量
-          in: query
-          name: limit
-          schema:
-            default: 10
-            type: integer
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_trendingSearchResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_trendingSearchResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取热搜词
       tags:
-        - discovery
+      - discovery
   /tags:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.createTagRequest"
+              $ref: '#/components/schemas/api.createTagRequest'
               description: 标签信息
               summary: body
         description: 标签信息
@@ -1978,429 +2201,472 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_tagResponse"
+                $ref: '#/components/schemas/render.Response-api_tagResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 创建标签
       tags:
-        - discovery
+      - discovery
   /tags/{tag_id}:
     get:
       parameters:
-        - description: 标签 ID
-          in: path
-          name: tag_id
-          required: true
-          schema:
-            type: string
+      - description: 标签 ID
+        in: path
+        name: tag_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_tagResponse"
+                $ref: '#/components/schemas/render.Response-api_tagResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取标签详情
       tags:
-        - discovery
+      - discovery
   /tags/{tag_id}/posts:
     get:
       parameters:
-        - description: 标签 ID
-          in: path
-          name: tag_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 标签 ID
+        in: path
+        name: tag_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_listPostsItemResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取标签帖子
       tags:
-        - discovery
+      - discovery
   /topics:
     get:
       parameters:
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_topicResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_topicResponse'
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取专题列表
       tags:
-        - discovery
+      - discovery
   /topics/{topic_id}:
     get:
       parameters:
-        - description: 专题 ID
-          in: path
-          name: topic_id
-          required: true
-          schema:
-            type: string
+      - description: 专题 ID
+        in: path
+        name: topic_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_topicResponse"
+                $ref: '#/components/schemas/render.Response-api_topicResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取专题详情
       tags:
-        - discovery
+      - discovery
   /topics/{topic_id}/posts:
     get:
       parameters:
-        - description: 专题 ID
-          in: path
-          name: topic_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 专题 ID
+        in: path
+        name: topic_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_listPostsItemResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取专题帖子
       tags:
-        - discovery
+      - discovery
   /users/{user_id}:
     get:
       parameters:
-        - description: 用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
+      - description: 用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_userResponse"
+                $ref: '#/components/schemas/render.Response-api_userProfileResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
       summary: 获取用户资料
       tags:
-        - users
+      - users
   /users/{user_id}/follow:
     delete:
       parameters:
-        - description: 目标用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
+      - description: 目标用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_followStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_followStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 取消关注
       tags:
-        - follows
+      - follows
     put:
       parameters:
-        - description: 目标用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
+      - description: 目标用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_followStatusResponse"
+                $ref: '#/components/schemas/render.Response-api_followStatusResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 关注用户
       tags:
-        - follows
+      - follows
   /users/{user_id}/followers:
     get:
       parameters:
-        - description: 用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_followUserResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_followUserResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取粉丝列表
       tags:
-        - follows
+      - follows
   /users/{user_id}/following:
     get:
       parameters:
-        - description: 用户 ID
-          in: path
-          name: user_id
-          required: true
-          schema:
-            type: string
-        - description: 页码
-          in: query
-          name: page
-          schema:
-            default: 1
-            type: integer
-        - description: 每页数量
-          in: query
-          name: page_size
-          schema:
-            default: 20
-            type: integer
+      - description: 用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-array_api_followUserResponse"
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_followUserResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       summary: 获取关注列表
       tags:
-        - follows
+      - follows
+  /users/{user_id}/posts:
+    get:
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      - description: 页码
+        in: query
+        name: page
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        schema:
+          default: 20
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
+          description: Internal Server Error
+      summary: 获取指定用户的帖子列表
+      tags:
+      - posts
   /users/profile:
     put:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/api.updateProfileRequest"
+              $ref: '#/components/schemas/api.updateProfileRequest'
               description: 更新信息
               summary: body
         description: 更新信息
@@ -2410,25 +2676,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_userResponse"
+                $ref: '#/components/schemas/render.Response-api_userResponse'
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
         "500":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.errorResponse"
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: 更新用户资料
       tags:
-        - users
+      - users
 servers:
-  - description: 本地开发环境
-    url: http://localhost:8080/api/v1
+- description: 本地开发环境
+  url: http://localhost:8080/api/v1

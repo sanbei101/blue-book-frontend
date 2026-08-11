@@ -25,6 +25,7 @@ import { customInstance } from "../../mutator";
 import type {
   ApiUpdateProfileRequest,
   RenderErrorResponse,
+  RenderResponseApiUserProfileResponse,
   RenderResponseApiUserResponse,
 } from "../api.schemas";
 
@@ -46,6 +47,116 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
+ * @summary 获取当前用户资料
+ */
+export const getMeProfile = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseApiUserProfileResponse>(
+    { url: `/me/profile`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetMeProfileQueryKey = () => {
+  return [`/me/profile`] as const;
+};
+
+export const getGetMeProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMeProfile>>,
+  TError = RenderErrorResponse,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeProfile>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMeProfileQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeProfile>>> = ({ signal }) =>
+    getMeProfile(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMeProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMeProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getMeProfile>>>;
+export type GetMeProfileQueryError = RenderErrorResponse;
+
+export function useGetMeProfile<
+  TData = Awaited<ReturnType<typeof getMeProfile>>,
+  TError = RenderErrorResponse,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeProfile>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getMeProfile>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMeProfile<
+  TData = Awaited<ReturnType<typeof getMeProfile>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeProfile>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getMeProfile>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMeProfile<
+  TData = Awaited<ReturnType<typeof getMeProfile>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeProfile>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary 获取当前用户资料
+ */
+
+export function useGetMeProfile<
+  TData = Awaited<ReturnType<typeof getMeProfile>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeProfile>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetMeProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+/**
  * @summary 获取用户资料
  */
 export const getUsersUserId = (
@@ -53,7 +164,7 @@ export const getUsersUserId = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseApiUserResponse>(
+  return customInstance<RenderResponseApiUserProfileResponse>(
     { url: `/users/${userId}`, method: "GET", signal },
     options,
   );

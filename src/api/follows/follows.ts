@@ -27,7 +27,7 @@ import type {
   GetUsersUserIdFollowingParams,
   RenderErrorResponse,
   RenderResponseApiFollowStatusResponse,
-  RenderResponseArrayApiFollowUserResponse,
+  RenderResponseApiPageResponseApiFollowUserResponse,
 } from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -212,7 +212,7 @@ export const getUsersUserIdFollowers = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiFollowUserResponse>(
+  return customInstance<RenderResponseApiPageResponseApiFollowUserResponse>(
     { url: `/users/${userId}/followers`, method: "GET", params, signal },
     options,
   );
@@ -355,7 +355,7 @@ export const getUsersUserIdFollowing = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiFollowUserResponse>(
+  return customInstance<RenderResponseApiPageResponseApiFollowUserResponse>(
     { url: `/users/${userId}/following`, method: "GET", params, signal },
     options,
   );

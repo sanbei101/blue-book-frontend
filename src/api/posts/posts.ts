@@ -26,11 +26,11 @@ import type {
   ApiCreatePostRequest,
   ApiUpdatePostRequest,
   GetPostsParams,
-  GetPostsUserUserIdParams,
+  GetUsersUserIdPostsParams,
   RenderErrorResponse,
   RenderResponseApiCreatePostResponse,
   RenderResponseApiGetPostsResponse,
-  RenderResponseArrayApiListPostsItemResponse,
+  RenderResponseApiPageResponseApiListPostsItemResponse,
   RenderResponseWithoutData,
 } from "../api.schemas";
 
@@ -59,7 +59,7 @@ export const getPosts = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
     { url: `/posts`, method: "GET", params, signal },
     options,
   );
@@ -538,71 +538,75 @@ export const usePatchPostsPostId = <TError = RenderErrorResponse, TContext = unk
 /**
  * @summary 获取指定用户的帖子列表
  */
-export const getPostsUserUserId = (
+export const getUsersUserIdPosts = (
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiListPostsItemResponse>(
-    { url: `/posts/user/${userId}`, method: "GET", params, signal },
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
+    { url: `/users/${userId}/posts`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetPostsUserUserIdQueryKey = (
+export const getGetUsersUserIdPostsQueryKey = (
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
 ) => {
-  return [`/posts/user/${userId}`, ...(params ? [params] : [])] as const;
+  return [`/users/${userId}/posts`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetPostsUserUserIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getPostsUserUserId>>,
+export const getGetUsersUserIdPostsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUsersUserIdPosts>>,
   TError = RenderErrorResponse,
 >(
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData>
+    >;
     request?: SecondParameter<typeof customInstance>;
   },
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetPostsUserUserIdQueryKey(userId, params);
+  const queryKey = queryOptions?.queryKey ?? getGetUsersUserIdPostsQueryKey(userId, params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPostsUserUserId>>> = ({ signal }) =>
-    getPostsUserUserId(userId, params, requestOptions, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersUserIdPosts>>> = ({ signal }) =>
+    getUsersUserIdPosts(userId, params, requestOptions, signal);
 
   return {
     queryKey,
     queryFn,
     enabled: userId !== null && userId !== undefined,
     ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData> & {
+  } as UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData> & {
     queryKey: DataTag<QueryKey, TData, TError>;
   };
 };
 
-export type GetPostsUserUserIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getPostsUserUserId>>
+export type GetUsersUserIdPostsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUsersUserIdPosts>>
 >;
-export type GetPostsUserUserIdQueryError = RenderErrorResponse;
+export type GetUsersUserIdPostsQueryError = RenderErrorResponse;
 
-export function useGetPostsUserUserId<
-  TData = Awaited<ReturnType<typeof getPostsUserUserId>>,
+export function useGetUsersUserIdPosts<
+  TData = Awaited<ReturnType<typeof getUsersUserIdPosts>>,
   TError = RenderErrorResponse,
 >(
   userId: string,
-  params: undefined | GetPostsUserUserIdParams,
+  params: undefined | GetUsersUserIdPostsParams,
   options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData>> &
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData>
+    > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPostsUserUserId>>,
+          Awaited<ReturnType<typeof getUsersUserIdPosts>>,
           TError,
-          Awaited<ReturnType<typeof getPostsUserUserId>>
+          Awaited<ReturnType<typeof getUsersUserIdPosts>>
         >,
         "initialData"
       >;
@@ -610,21 +614,21 @@ export function useGetPostsUserUserId<
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetPostsUserUserId<
-  TData = Awaited<ReturnType<typeof getPostsUserUserId>>,
+export function useGetUsersUserIdPosts<
+  TData = Awaited<ReturnType<typeof getUsersUserIdPosts>>,
   TError = RenderErrorResponse,
 >(
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPostsUserUserId>>,
+          Awaited<ReturnType<typeof getUsersUserIdPosts>>,
           TError,
-          Awaited<ReturnType<typeof getPostsUserUserId>>
+          Awaited<ReturnType<typeof getUsersUserIdPosts>>
         >,
         "initialData"
       >;
@@ -632,14 +636,16 @@ export function useGetPostsUserUserId<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetPostsUserUserId<
-  TData = Awaited<ReturnType<typeof getPostsUserUserId>>,
+export function useGetUsersUserIdPosts<
+  TData = Awaited<ReturnType<typeof getUsersUserIdPosts>>,
   TError = RenderErrorResponse,
 >(
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData>
+    >;
     request?: SecondParameter<typeof customInstance>;
   },
   queryClient?: QueryClient,
@@ -648,19 +654,21 @@ export function useGetPostsUserUserId<
  * @summary 获取指定用户的帖子列表
  */
 
-export function useGetPostsUserUserId<
-  TData = Awaited<ReturnType<typeof getPostsUserUserId>>,
+export function useGetUsersUserIdPosts<
+  TData = Awaited<ReturnType<typeof getUsersUserIdPosts>>,
   TError = RenderErrorResponse,
 >(
   userId: string,
-  params?: GetPostsUserUserIdParams,
+  params?: GetUsersUserIdPostsParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostsUserUserId>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsersUserIdPosts>>, TError, TData>
+    >;
     request?: SecondParameter<typeof customInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetPostsUserUserIdQueryOptions(userId, params, options);
+  const queryOptions = getGetUsersUserIdPostsQueryOptions(userId, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

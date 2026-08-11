@@ -26,12 +26,13 @@ import type {
   ApiCollectPostRequest,
   ApiCreateFolderRequest,
   ApiUpdateFolderRequest,
+  GetMeCollectionsFoldersParams,
   GetMeCollectionsParams,
   RenderErrorResponse,
   RenderResponseApiCollectionStatusResponse,
   RenderResponseApiFolderResponse,
-  RenderResponseArrayApiCollectionItemResponse,
-  RenderResponseArrayApiFolderResponse,
+  RenderResponseApiPageResponseApiFolderResponse,
+  RenderResponseApiPageResponseApiListPostsItemResponse,
   RenderResponseWithoutData,
 } from "../api.schemas";
 
@@ -60,7 +61,7 @@ export const getMeCollections = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiCollectionItemResponse>(
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
     { url: `/me/collections`, method: "GET", params, signal },
     options,
   );
@@ -174,35 +175,39 @@ export function useGetMeCollections<
  * @summary 获取收藏夹列表
  */
 export const getMeCollectionsFolders = (
+  params?: GetMeCollectionsFoldersParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiFolderResponse>(
-    { url: `/me/collections/folders`, method: "GET", signal },
+  return customInstance<RenderResponseApiPageResponseApiFolderResponse>(
+    { url: `/me/collections/folders`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetMeCollectionsFoldersQueryKey = () => {
-  return [`/me/collections/folders`] as const;
+export const getGetMeCollectionsFoldersQueryKey = (params?: GetMeCollectionsFoldersParams) => {
+  return [`/me/collections/folders`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMeCollectionsFoldersQueryOptions = <
   TData = Awaited<ReturnType<typeof getMeCollectionsFolders>>,
   TError = RenderErrorResponse,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+  params?: GetMeCollectionsFoldersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetMeCollectionsFoldersQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetMeCollectionsFoldersQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeCollectionsFolders>>> = ({
     signal,
-  }) => getMeCollectionsFolders(requestOptions, signal);
+  }) => getMeCollectionsFolders(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getMeCollectionsFolders>>,
@@ -220,6 +225,7 @@ export function useGetMeCollectionsFolders<
   TData = Awaited<ReturnType<typeof getMeCollectionsFolders>>,
   TError = RenderErrorResponse,
 >(
+  params: undefined | GetMeCollectionsFoldersParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
@@ -240,6 +246,7 @@ export function useGetMeCollectionsFolders<
   TData = Awaited<ReturnType<typeof getMeCollectionsFolders>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeCollectionsFoldersParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
@@ -260,6 +267,7 @@ export function useGetMeCollectionsFolders<
   TData = Awaited<ReturnType<typeof getMeCollectionsFolders>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeCollectionsFoldersParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
@@ -276,6 +284,7 @@ export function useGetMeCollectionsFolders<
   TData = Awaited<ReturnType<typeof getMeCollectionsFolders>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeCollectionsFoldersParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMeCollectionsFolders>>, TError, TData>
@@ -284,7 +293,7 @@ export function useGetMeCollectionsFolders<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetMeCollectionsFoldersQueryOptions(options);
+  const queryOptions = getGetMeCollectionsFoldersQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

@@ -25,6 +25,7 @@ import { customInstance } from "../../mutator";
 import type {
   ApiCreateTagRequest,
   GetFeedRecommendedParams,
+  GetMeSearchHistoryParams,
   GetSearchParams,
   GetSearchSuggestionsParams,
   GetSearchTrendingParams,
@@ -32,13 +33,13 @@ import type {
   GetTopicsParams,
   GetTopicsTopicIdPostsParams,
   RenderErrorResponse,
+  RenderResponseApiPageResponseApiListPostsItemResponse,
+  RenderResponseApiPageResponseApiSearchHistoryResponse,
+  RenderResponseApiPageResponseApiTopicResponse,
+  RenderResponseApiPageResponseApiTrendingSearchResponse,
   RenderResponseApiSearchResponse,
   RenderResponseApiTagResponse,
   RenderResponseApiTopicResponse,
-  RenderResponseArrayApiListPostsItemResponse,
-  RenderResponseArrayApiSearchHistoryResponse,
-  RenderResponseArrayApiTopicResponse,
-  RenderResponseArrayApiTrendingSearchResponse,
   RenderResponseWithoutData,
 } from "../api.schemas";
 
@@ -67,7 +68,7 @@ export const getFeedRecommended = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
     { url: `/feed/recommended`, method: "GET", params, signal },
     options,
   );
@@ -255,32 +256,36 @@ export const useDeleteMeSearchHistory = <TError = RenderErrorResponse, TContext 
  * @summary 获取搜索历史
  */
 export const getMeSearchHistory = (
+  params?: GetMeSearchHistoryParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiSearchHistoryResponse>(
-    { url: `/me/search-history`, method: "GET", signal },
+  return customInstance<RenderResponseApiPageResponseApiSearchHistoryResponse>(
+    { url: `/me/search-history`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetMeSearchHistoryQueryKey = () => {
-  return [`/me/search-history`] as const;
+export const getGetMeSearchHistoryQueryKey = (params?: GetMeSearchHistoryParams) => {
+  return [`/me/search-history`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMeSearchHistoryQueryOptions = <
   TData = Awaited<ReturnType<typeof getMeSearchHistory>>,
   TError = RenderErrorResponse,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+  params?: GetMeSearchHistoryParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetMeSearchHistoryQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetMeSearchHistoryQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeSearchHistory>>> = ({ signal }) =>
-    getMeSearchHistory(requestOptions, signal);
+    getMeSearchHistory(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getMeSearchHistory>>,
@@ -298,6 +303,7 @@ export function useGetMeSearchHistory<
   TData = Awaited<ReturnType<typeof getMeSearchHistory>>,
   TError = RenderErrorResponse,
 >(
+  params: undefined | GetMeSearchHistoryParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>> &
       Pick<
@@ -316,6 +322,7 @@ export function useGetMeSearchHistory<
   TData = Awaited<ReturnType<typeof getMeSearchHistory>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeSearchHistoryParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>
@@ -336,6 +343,7 @@ export function useGetMeSearchHistory<
   TData = Awaited<ReturnType<typeof getMeSearchHistory>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeSearchHistoryParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -350,13 +358,14 @@ export function useGetMeSearchHistory<
   TData = Awaited<ReturnType<typeof getMeSearchHistory>>,
   TError = RenderErrorResponse,
 >(
+  params?: GetMeSearchHistoryParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeSearchHistory>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetMeSearchHistoryQueryOptions(options);
+  const queryOptions = getGetMeSearchHistoryQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -621,7 +630,7 @@ export const getSearchTrending = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiTrendingSearchResponse>(
+  return customInstance<RenderResponseApiPageResponseApiTrendingSearchResponse>(
     { url: `/search/trending`, method: "GET", params, signal },
     options,
   );
@@ -945,7 +954,7 @@ export const getTagsTagIdPosts = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
     { url: `/tags/${tagId}/posts`, method: "GET", params, signal },
     options,
   );
@@ -1073,7 +1082,7 @@ export const getTopics = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiTopicResponse>(
+  return customInstance<RenderResponseApiPageResponseApiTopicResponse>(
     { url: `/topics`, method: "GET", params, signal },
     options,
   );
@@ -1313,7 +1322,7 @@ export const getTopicsTopicIdPosts = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseArrayApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
     { url: `/topics/${topicId}/posts`, method: "GET", params, signal },
     options,
   );
