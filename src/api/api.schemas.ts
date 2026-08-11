@@ -317,6 +317,11 @@ export interface ApiListPostsItemResponse {
   cover_url: string;
   /** 创建时间 */
   created_at: string;
+  /**
+   * 封面高度
+   * @minimum 0
+   */
+  height: number;
   /** 帖子 ID */
   id: string;
   /**
@@ -335,6 +340,11 @@ export interface ApiListPostsItemResponse {
   viewer_collected: boolean;
   /** 当前用户是否已点赞 */
   viewer_liked: boolean;
+  /**
+   * 封面宽度
+   * @minimum 0
+   */
+  width: number;
 }
 
 export interface ApiLoginRequest {

@@ -1,112 +1,104 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { Heart, ImageOff } from "lucide-react";
+import { useState, useMemo } from "react";
 
-import type { ApiListPostsItemResponse } from "@/api/api.schemas";
+import type { ApiListPostsItemResponse as CardProps } from "@/api/api.schemas";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { formatCount, cn } from "@/lib/utils";
 
 type PostCardProps = {
-  post: ApiListPostsItemResponse;
+  post: CardProps;
 };
 
-const COVER_GRADIENTS = [
-  "from-rose-200 via-pink-200 to-fuchsia-200",
-  "from-amber-200 via-orange-200 to-rose-200",
-  "from-sky-200 via-indigo-200 to-violet-200",
-  "from-emerald-200 via-teal-200 to-cyan-200",
-  "from-violet-200 via-purple-200 to-pink-200",
-];
+function getVisualAspectRatio(id: string, width?: number, height?: number) {
+  if (!width || !height || width <= 0 || height <= 0) return 0.75;
 
-function coverGradient(seed: string) {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
-  return COVER_GRADIENTS[Math.abs(h) % COVER_GRADIENTS.length];
+  const realRatio = width / height;
+
+  if (Math.abs(realRatio - 0.75) < 0.02) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+
+    const VARIANTS = [0.58, 0.82, 0.7, 1.0, 0.62, 0.75];
+    return VARIANTS[Math.abs(hash) % VARIANTS.length];
+  }
+
+  return Math.max(0.55, Math.min(realRatio, 1.25));
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const { id } = post;
+  const { id, title, width, height, cover_url, author, like_count, viewer_liked } = post;
   const [imgFailed, setImgFailed] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
-  const [ratio, setRatio] = useState<number | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const aspectRatio = useMemo(() => getVisualAspectRatio(id, width, height), [id, width, height]);
 
   return (
-    <Card className="ring-foreground/5 gap-0 rounded-2xl py-0 ring-1">
-      <Link
-        to="/posts/$postId"
-        params={{ postId: id }}
-        className="block"
-        activeProps={{ className: "opacity-90" }}
-      >
-        <div
-          className={cn(
-            "relative w-full overflow-hidden bg-muted",
-            `bg-gradient-to-br ${coverGradient(id)}`,
-          )}
-          style={{ aspectRatio: ratio ?? 3 / 4 }}
-        >
-          {post.cover_url && !imgFailed ? (
+    <Card className="group border-border/40 bg-card overflow-hidden rounded-xl border p-0 shadow-none transition-all duration-200 hover:shadow-md">
+      <Link to="/posts/$postId" params={{ postId: id }} className="block w-full overflow-hidden">
+        {/* 占位与裁剪容器 */}
+        <div className="bg-muted relative w-full overflow-hidden" style={{ aspectRatio }}>
+          {cover_url && !imgFailed ? (
             <img
-              src={post.cover_url}
-              alt={post.title}
+              src={cover_url}
+              alt={title}
               loading="lazy"
-              onLoad={(e) => {
-                const img = e.currentTarget;
-                if (img.naturalWidth && img.naturalHeight) {
-                  setRatio(img.naturalWidth / img.naturalHeight);
-                }
-              }}
+              decoding="async"
+              onLoad={() => setIsLoaded(true)}
               onError={() => setImgFailed(true)}
-              className="size-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+              className={cn(
+                "block size-full object-cover transition-all duration-300 ease-out group-hover:scale-105",
+                isLoaded ? "opacity-100" : "opacity-0",
+              )}
             />
           ) : (
-            <div className="flex size-full items-end p-3">
-              <span className="line-clamp-2 text-sm font-semibold text-white drop-shadow-md">
-                {post.title}
+            <div className="bg-secondary/40 text-muted-foreground flex size-full flex-col items-center justify-center gap-2 p-4">
+              <ImageOff className="size-5 opacity-40" />
+              <span className="line-clamp-2 text-center text-xs font-medium opacity-60">
+                {title}
               </span>
             </div>
           )}
-          <span className="absolute right-1.5 bottom-1.5 rounded-md bg-black/50 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-            {formatCount(post.view_count)}
-          </span>
         </div>
       </Link>
 
-      <div className="px-2.5 py-2">
+      {/* 底部文案区 */}
+      <div className="p-2.5">
         <Link
           to="/posts/$postId"
           params={{ postId: id }}
-          className="text-foreground hover:text-primary line-clamp-2 text-[13px] leading-snug font-medium"
+          className="text-foreground hover:text-primary line-clamp-2 text-xs leading-snug font-medium transition-colors"
         >
-          {post.title}
+          {title}
         </Link>
 
-        <div className="mt-1.5 flex items-center justify-between">
+        <div className="mt-2 flex items-center justify-between gap-1">
           <Link
             to="/users/$userId"
-            params={{ userId: post.author.id }}
-            className="flex min-w-0 items-center gap-1.5"
+            params={{ userId: author.id }}
+            className="flex min-w-0 items-center gap-1.5 transition-opacity hover:opacity-80"
           >
-            <Avatar size="sm">
+            <Avatar className="border-border/40 size-5 shrink-0 border">
               {!avatarFailed && (
-                <AvatarImage src={post.author.avatar_url} onError={() => setAvatarFailed(true)} />
+                <AvatarImage src={author.avatar_url} onError={() => setAvatarFailed(true)} />
               )}
-              <AvatarFallback>{post.author.username.slice(0, 1)}</AvatarFallback>
+              <AvatarFallback className="bg-muted text-muted-foreground text-[10px]">
+                {author.username.slice(0, 1)}
+              </AvatarFallback>
             </Avatar>
-            <span className="text-muted-foreground truncate text-[11px]">
-              {post.author.username}
-            </span>
+            <span className="text-muted-foreground truncate text-[11px]">{author.username}</span>
           </Link>
 
-          <div className="text-muted-foreground flex items-center gap-2 text-[11px]">
-            <span className="flex items-center gap-0.5">
-              <Heart className="size-3" /> {formatCount(post.like_count)}
-            </span>
-            <span className="flex items-center gap-0.5">
-              <MessageCircle className="size-3" />
-              {formatCount(post.comment_count)}
-            </span>
+          <div
+            className={cn(
+              "flex items-center gap-1 text-[11px] shrink-0 transition-colors",
+              viewer_liked ? "text-primary font-medium" : "text-muted-foreground",
+            )}
+          >
+            <Heart className={cn("size-3.5", viewer_liked && "fill-primary text-primary")} />
+            <span>{formatCount(like_count)}</span>
           </div>
         </div>
       </div>
