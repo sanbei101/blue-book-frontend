@@ -59,7 +59,7 @@ export function ExplorePage() {
               key={item.keyword}
               variant={i < 3 ? "default" : "secondary"}
               className="cursor-pointer rounded-full px-3 py-1"
-              onClick={() => setQuery(item.keyword ?? "")}
+              onClick={() => setQuery(item.keyword)}
             >
               <span className="mr-1">#{i + 1}</span>
               {item.keyword}
@@ -77,14 +77,12 @@ export function ExplorePage() {
             <Card
               key={topic.id}
               className="bg-muted relative cursor-pointer overflow-hidden border-0 ring-0"
-              onClick={() => setQuery(topic.name ?? "")}
+              onClick={() => setQuery(topic.name)}
             >
               <CardContent className="relative flex h-20 items-end p-3">
                 <div>
                   <div className="text-lg font-bold">{topic.name}</div>
-                  <div className="text-muted-foreground text-[11px]">
-                    {topic.post_count ?? 0} 笔记
-                  </div>
+                  <div className="text-muted-foreground text-[11px]">{topic.post_count} 笔记</div>
                 </div>
               </CardContent>
             </Card>
@@ -107,7 +105,7 @@ export function ExplorePage() {
                 </Card>
               ))}
             </div>
-          ) : searchResults?.posts?.items.length ? (
+          ) : searchResults?.posts.items.length ? (
             <MasonryFeed posts={searchResults.posts.items} />
           ) : (
             <p className="text-muted-foreground py-12 text-center text-sm">没有找到相关内容</p>
@@ -137,9 +135,9 @@ export function ExplorePage() {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="line-clamp-2 text-sm font-medium">{p.title}</p>
-                      <p className="text-muted-foreground mt-1 text-xs">{p.author?.username}</p>
+                      <p className="text-muted-foreground mt-1 text-xs">{p.author.username}</p>
                       <p className="text-muted-foreground mt-0.5 text-[11px]">
-                        👁 {p.view_count ?? 0} 浏览
+                        👁 {p.view_count} 浏览
                       </p>
                     </div>
                   </Card>

@@ -71,7 +71,7 @@ export function ProfilePage() {
               <div className="flex items-end justify-between">
                 <Avatar size="lg" className="ring-background size-20 ring-4">
                   <AvatarImage src={user.avatar_url} />
-                  <AvatarFallback>{(user.username ?? "?").slice(0, 1)}</AvatarFallback>
+                  <AvatarFallback>{user.username.slice(0, 1)}</AvatarFallback>
                 </Avatar>
                 <Button size="sm" variant="outline" className="rounded-full">
                   <Edit3 className="mr-1 size-3" />

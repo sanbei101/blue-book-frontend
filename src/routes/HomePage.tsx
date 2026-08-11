@@ -18,7 +18,7 @@ export function HomePage() {
   const posts =
     category === "推荐"
       ? (recommendedQuery.data?.items ?? [])
-      : (searchQuery.data?.posts?.items ?? []);
+      : (searchQuery.data?.posts.items ?? []);
   const loading = category === "推荐" ? recommendedQuery.isPending : searchQuery.isPending;
 
   return (

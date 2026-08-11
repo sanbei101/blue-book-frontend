@@ -149,7 +149,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
     );
   }
 
-  const media = post.media ?? [];
+  const { author, media, tags } = post;
   const cover = media[activeImage]?.media_url ?? "";
   const dotButtons = media.map((_, i) => i);
 
@@ -219,39 +219,39 @@ export function PostDetailPage({ postId }: { postId: string }) {
 
       <Card className="ring-foreground/5 mx-3 ring-1">
         <CardContent className="flex items-center gap-3 p-3">
-          <Link to="/users/$userId" params={{ userId: post.author?.id ?? "" }}>
+          <Link to="/users/$userId" params={{ userId: author.id }}>
             <Avatar size="lg">
-              <AvatarImage src={post.author?.avatar_url} />
-              <AvatarFallback>{(post.author?.username ?? "?").slice(0, 1)}</AvatarFallback>
+              <AvatarImage src={author.avatar_url} />
+              <AvatarFallback>{author.username.slice(0, 1)}</AvatarFallback>
             </Avatar>
           </Link>
           <div className="min-w-0 flex-1">
             <Link
               to="/users/$userId"
-              params={{ userId: post.author?.id ?? "" }}
+              params={{ userId: author.id }}
               className="hover:text-primary text-sm font-semibold"
             >
-              {post.author?.username}
+              {author.username}
             </Link>
           </div>
           <Button
             size="sm"
             className="rounded-full px-5"
-            variant={post.author?.viewer_following ? "outline" : "default"}
+            variant={author.viewer_following ? "outline" : "default"}
             onClick={handleFollow}
             disabled={followMutation.isPending || unfollowMutation.isPending}
           >
-            {post.author?.viewer_following ? "已关注" : "关注"}
+            {author.viewer_following ? "已关注" : "关注"}
           </Button>
         </CardContent>
       </Card>
 
       <div className="text-foreground/90 px-4 py-3 text-sm leading-relaxed">{post.content}</div>
 
-      {post.tags?.length ? (
+      {tags.length ? (
         <div className="flex flex-wrap gap-1.5 px-4 pb-3">
-          {post.tags.map((tag) => (
-            <Badge key={tag.id ?? tag.name} variant="secondary" className="rounded-full">
+          {tags.map((tag) => (
+            <Badge key={tag.id} variant="secondary" className="rounded-full">
               #{tag.name}
             </Badge>
           ))}
@@ -274,7 +274,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
               <div key={c.id} className="flex gap-2.5 py-2.5">
                 <Avatar size="default">
                   <AvatarImage src={c.author_avatar} />
-                  <AvatarFallback>{(c.author_username ?? "?").slice(0, 1)}</AvatarFallback>
+                  <AvatarFallback>{c.author_username.slice(0, 1)}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <p className="text-muted-foreground text-xs font-medium">{c.author_username}</p>
@@ -299,7 +299,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
         </TabsContent>
 
         <TabsContent value="related" className="mt-2 pb-24">
-          {related && related.length > 0 ? (
+          {related.length > 0 ? (
             <MasonryFeed posts={related} />
           ) : (
             <p className="text-muted-foreground py-10 text-center text-sm">暂无推荐</p>

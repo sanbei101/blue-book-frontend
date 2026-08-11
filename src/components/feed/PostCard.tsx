@@ -2,20 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { Heart, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
+import type { ApiListPostsItemResponse } from "@/api/api.schemas";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { formatCount, cn } from "@/lib/utils";
 
 type PostCardProps = {
-  post: {
-    id?: string;
-    title?: string;
-    cover_url?: string;
-    view_count?: number;
-    like_count?: number;
-    comment_count?: number;
-    author?: { id?: string; username?: string; avatar_url?: string };
-  };
+  post: ApiListPostsItemResponse;
 };
 
 const COVER_GRADIENTS = [
@@ -33,7 +26,7 @@ function coverGradient(seed: string) {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const id = post.id ?? "";
+  const { id } = post;
   const [imgFailed, setImgFailed] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [ratio, setRatio] = useState<number | null>(null);
@@ -49,14 +42,14 @@ export function PostCard({ post }: PostCardProps) {
         <div
           className={cn(
             "relative w-full overflow-hidden bg-muted",
-            `bg-gradient-to-br ${coverGradient(id || post.title || "x")}`,
+            `bg-gradient-to-br ${coverGradient(id)}`,
           )}
           style={{ aspectRatio: ratio ?? 3 / 4 }}
         >
           {post.cover_url && !imgFailed ? (
             <img
               src={post.cover_url}
-              alt={post.title ?? ""}
+              alt={post.title}
               loading="lazy"
               onLoad={(e) => {
                 const img = e.currentTarget;
@@ -92,17 +85,17 @@ export function PostCard({ post }: PostCardProps) {
         <div className="mt-1.5 flex items-center justify-between">
           <Link
             to="/users/$userId"
-            params={{ userId: post.author?.id ?? "u1" }}
+            params={{ userId: post.author.id }}
             className="flex min-w-0 items-center gap-1.5"
           >
             <Avatar size="sm">
-              {post.author?.avatar_url && !avatarFailed && (
+              {!avatarFailed && (
                 <AvatarImage src={post.author.avatar_url} onError={() => setAvatarFailed(true)} />
               )}
-              <AvatarFallback>{(post.author?.username ?? "?").slice(0, 1)}</AvatarFallback>
+              <AvatarFallback>{post.author.username.slice(0, 1)}</AvatarFallback>
             </Avatar>
             <span className="text-muted-foreground truncate text-[11px]">
-              {post.author?.username}
+              {post.author.username}
             </span>
           </Link>
 

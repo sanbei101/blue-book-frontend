@@ -83,10 +83,10 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
 
       localStorage.setItem("access_token", auth.access_token);
       if (auth.refresh_token) localStorage.setItem("refresh_token", auth.refresh_token);
-      if (auth.user?.id) localStorage.setItem(ME_KEY, auth.user.id);
+      localStorage.setItem(ME_KEY, auth.user.id);
 
       toast.success(mode === "login" ? "登录成功" : "注册成功");
-      if (auth.user?.id) onAuthenticated?.(auth.user.id);
+      onAuthenticated?.(auth.user.id);
       if (!onAuthenticated) void navigate({ to: "/me" });
     } catch (err) {
       setError(err instanceof ApiError ? err.msg : mode === "login" ? "登录失败" : "注册失败");
@@ -274,7 +274,7 @@ export function UserProfilePage({ userId }: { userId: string }) {
         <div className="flex items-center gap-4">
           <Avatar className="ring-primary/20 size-20 ring-2">
             <AvatarImage src={user.avatar_url} />
-            <AvatarFallback>{(user.username ?? "?").slice(0, 1)}</AvatarFallback>
+            <AvatarFallback>{user.username.slice(0, 1)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <h2 className="text-xl font-bold">{user.username}</h2>
