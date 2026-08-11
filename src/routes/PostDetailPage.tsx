@@ -31,9 +31,7 @@ import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCount } from "@/lib/utils";
@@ -139,12 +137,27 @@ export function PostDetailPage({ postId }: { postId: string }) {
     }
   };
 
-  if (postQuery.isPending || !post) {
+  if (postQuery.isPending) {
     return (
-      <div className="space-y-3 p-3">
-        <Skeleton className="aspect-[3/4] w-full rounded-none" />
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
+      <div className="mx-auto grid max-w-6xl gap-5 p-4 md:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)] md:p-5">
+        <Skeleton className="aspect-[3/4] w-full md:aspect-auto md:h-[calc(100vh-2.5rem)]" />
+        <div className="space-y-5 py-3">
+          <Skeleton className="h-7 w-3/4" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-14 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
+        <p className="text-muted-foreground text-sm">笔记无法加载,请稍后重试</p>
+        <Button render={<Link to="/" />} variant="outline">
+          返回首页
+        </Button>
       </div>
     );
   }
@@ -154,205 +167,253 @@ export function PostDetailPage({ postId }: { postId: string }) {
   const dotButtons = media.map((_, i) => i);
 
   return (
-    <div className="bg-background mx-auto max-w-5xl">
-      {/* Hero image */}
-      <div
-        className="bg-muted relative mx-auto w-full max-w-xl overflow-hidden"
-        style={{ aspectRatio: coverRatio ?? 3 / 4 }}
-      >
-        {cover ? (
-          <img
-            src={cover}
-            alt={post.title}
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              if (img.naturalWidth && img.naturalHeight) {
-                setCoverRatio(img.naturalWidth / img.naturalHeight);
-              }
-            }}
-            className="size-full object-contain"
-          />
-        ) : (
-          <div className="from-primary/20 to-primary/5 size-full bg-gradient-to-br" />
-        )}
-
-        <Link
-          to="/"
-          className="absolute top-3 left-3 flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur"
+    <main className="bg-background md:bg-muted/40 min-h-screen md:p-5">
+      <div className="bg-card mx-auto max-w-6xl md:grid md:min-h-[calc(100vh-2.5rem)] md:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)] md:overflow-hidden md:border">
+        <div
+          className="bg-muted relative w-full overflow-hidden md:sticky md:top-5 md:!aspect-auto md:h-[calc(100vh-2.5rem)]"
+          style={{ aspectRatio: coverRatio ?? 3 / 4 }}
         >
-          <ArrowLeft className="size-4" />
-        </Link>
-        <button className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur">
-          <MoreHorizontal className="size-4" />
-        </button>
+          {cover ? (
+            <img
+              src={cover}
+              alt={post.title}
+              onLoad={(e) => {
+                const img = e.currentTarget;
+                if (img.naturalWidth && img.naturalHeight) {
+                  setCoverRatio(img.naturalWidth / img.naturalHeight);
+                }
+              }}
+              className="size-full object-contain"
+            />
+          ) : (
+            <div className="text-muted-foreground flex size-full items-center justify-center p-8 text-center text-sm">
+              暂无图片
+            </div>
+          )}
 
-        {media.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {dotButtons.map((i) => (
-              <button
-                key={i}
-                onClick={() => handleImageSelect(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === activeImage ? "w-6 bg-white" : "w-1.5 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-        {media.length > 1 && (
-          <span className="absolute right-3 bottom-3 rounded-full bg-black/40 px-2 py-0.5 text-xs text-white backdrop-blur">
-            {activeImage + 1}/{media.length}
-          </span>
-        )}
-      </div>
-
-      <div className="px-4 pt-4">
-        <h1 className="text-xl leading-tight font-bold">{post.title}</h1>
-        <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs">
-          <span>{post.created_at}</span>
-          <span>·</span>
-          <span>{formatCount(post.view_count)} 浏览</span>
-        </div>
-      </div>
-
-      <Separator className="my-3" />
-
-      <Card className="ring-foreground/5 mx-3 ring-1">
-        <CardContent className="flex items-center gap-3 p-3">
-          <Link to="/users/$userId" params={{ userId: author.id }}>
-            <Avatar size="lg">
-              <AvatarImage src={author.avatar_url} />
-              <AvatarFallback>{author.username.slice(0, 1)}</AvatarFallback>
-            </Avatar>
-          </Link>
-          <div className="min-w-0 flex-1">
-            <Link
-              to="/users/$userId"
-              params={{ userId: author.id }}
-              className="hover:text-primary text-sm font-semibold"
-            >
-              {author.username}
-            </Link>
-          </div>
-          <Button
-            size="sm"
-            className="rounded-full px-5"
-            variant={author.viewer_following ? "outline" : "default"}
-            onClick={handleFollow}
-            disabled={followMutation.isPending || unfollowMutation.isPending}
+          <Link
+            to="/"
+            aria-label="返回首页"
+            className="absolute top-3 left-3 flex size-9 items-center justify-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur transition-colors hover:bg-black/60"
           >
-            {author.viewer_following ? "已关注" : "关注"}
-          </Button>
-        </CardContent>
-      </Card>
+            <ArrowLeft className="size-4" />
+          </Link>
+          <button
+            type="button"
+            aria-label="更多操作"
+            title="更多操作"
+            className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur transition-colors hover:bg-black/60"
+          >
+            <MoreHorizontal className="size-4" />
+          </button>
 
-      <div className="text-foreground/90 px-4 py-3 text-sm leading-relaxed">{post.content}</div>
-
-      {tags.length ? (
-        <div className="flex flex-wrap gap-1.5 px-4 pb-3">
-          {tags.map((tag) => (
-            <Badge key={tag.id} variant="secondary" className="rounded-full">
-              #{tag.name}
-            </Badge>
-          ))}
-        </div>
-      ) : null}
-
-      <Separator />
-
-      <Tabs defaultValue="comments" className="px-3 pt-2">
-        <TabsList variant="line" className="w-full justify-start gap-4">
-          <TabsTrigger value="comments">评论 {post.comment_count}</TabsTrigger>
-          <TabsTrigger value="related">相关推荐</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="comments" className="mt-2 space-y-0 pb-24">
-          {comments.length === 0 ? (
-            <p className="text-muted-foreground py-10 text-center text-sm">还没有评论,快来抢沙发</p>
-          ) : (
-            comments.map((c) => (
-              <div key={c.id} className="flex gap-2.5 py-2.5">
-                <Avatar size="default">
-                  <AvatarImage src={c.author_avatar} />
-                  <AvatarFallback>{c.author_username.slice(0, 1)}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="text-muted-foreground text-xs font-medium">{c.author_username}</p>
-                  <p className="mt-0.5 text-sm">{c.content}</p>
-                  <div className="text-muted-foreground mt-1 flex items-center gap-3 text-[11px]">
-                    <span>{c.created_at}</span>
-                    <button>回复</button>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleCommentLike(c.id, c.viewer_liked)}
-                  className={`flex flex-col items-center gap-0.5 ${c.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
-                  aria-label="点赞评论"
-                  disabled={likeCommentMutation.isPending || unlikeCommentMutation.isPending}
-                >
-                  <Heart className={`size-4 ${c.viewer_liked ? "fill-primary" : ""}`} />
-                  <span className="text-[10px]">{formatCount(c.like_count)}</span>
-                </button>
+          {media.length > 1 && (
+            <>
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                {dotButtons.map((i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleImageSelect(i)}
+                    aria-label={`查看第 ${i + 1} 张图片`}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === activeImage ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/75"
+                    }`}
+                  />
+                ))}
               </div>
-            ))
+              <span className="absolute right-3 bottom-3 rounded-full bg-black/45 px-2 py-0.5 text-xs text-white tabular-nums backdrop-blur">
+                {activeImage + 1}/{media.length}
+              </span>
+            </>
           )}
-        </TabsContent>
+        </div>
 
-        <TabsContent value="related" className="mt-2 pb-24">
-          {related.length > 0 ? (
-            <MasonryFeed posts={related} />
-          ) : (
-            <p className="text-muted-foreground py-10 text-center text-sm">暂无推荐</p>
-          )}
-        </TabsContent>
-      </Tabs>
+        <section className="min-w-0 pb-20 md:pb-0">
+          <div className="border-border/70 border-b px-4 pt-5 pb-4 md:px-6 md:pt-7">
+            <div className="flex items-start gap-3">
+              <Link to="/users/$userId" params={{ userId: author.id }}>
+                <Avatar size="lg" className="ring-border size-11 ring-1">
+                  <AvatarImage src={author.avatar_url} />
+                  <AvatarFallback>{author.username.slice(0, 1)}</AvatarFallback>
+                </Avatar>
+              </Link>
+              <div className="min-w-0 flex-1 pt-0.5">
+                <Link
+                  to="/users/$userId"
+                  params={{ userId: author.id }}
+                  className="hover:text-primary text-sm font-semibold"
+                >
+                  {author.username}
+                </Link>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {post.created_at} · {formatCount(post.view_count)} 浏览
+                </p>
+              </div>
+              <Button
+                size="sm"
+                className="mt-0.5 rounded-full px-3"
+                variant={author.viewer_following ? "outline" : "default"}
+                onClick={handleFollow}
+                disabled={followMutation.isPending || unfollowMutation.isPending}
+              >
+                {author.viewer_following ? "已关注" : "关注"}
+              </Button>
+            </div>
 
-      <div className="border-border/60 bg-background/95 fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-5xl items-center gap-2 border-t px-3 py-2 backdrop-blur">
-        <Input
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              void handleComment();
-            }
-          }}
-          placeholder="说点什么..."
-          className="bg-muted h-9 flex-1 rounded-full"
-        />
-        <button
-          onClick={() => void handleComment()}
-          className="text-primary flex items-center gap-1 text-xs"
-          aria-label="发表评论"
-          disabled={createCommentMutation.isPending}
-        >
-          <Send className="size-5" />
-        </button>
-        <button
-          onClick={handleLike}
-          className={`flex items-center gap-1 text-xs ${post.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
-          disabled={likeMutation.isPending || unlikeMutation.isPending}
-        >
-          <Heart className={`size-5 ${post.viewer_liked ? "fill-primary" : ""}`} />
-          {formatCount(post.like_count)}
-        </button>
-        <button
-          onClick={handleCollection}
-          className={`flex items-center gap-1 text-xs ${post.viewer_collected ? "text-primary" : "text-muted-foreground"}`}
-          aria-label="收藏帖子"
-          disabled={collectMutation.isPending || uncollectMutation.isPending}
-        >
-          <Bookmark className={`size-5 ${post.viewer_collected ? "fill-primary" : ""}`} />
-          {formatCount(post.collect_count)}
-        </button>
-        <button className="text-muted-foreground flex items-center gap-1 text-xs">
-          <MessageCircle className="size-5" />
-          {post.comment_count}
-        </button>
-        <button className="text-muted-foreground flex items-center gap-1 text-xs">
-          <Share2 className="size-5" />
-        </button>
+            <h1 className="mt-5 text-[1.35rem] leading-snug font-bold text-balance">
+              {post.title}
+            </h1>
+            <div className="text-foreground/90 mt-3 text-sm leading-7 whitespace-pre-wrap">
+              {post.content}
+            </div>
+
+            {tags.length ? (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant="secondary"
+                    className="h-6 rounded-full px-2 text-xs font-medium"
+                  >
+                    #{tag.name}
+                  </Badge>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="border-border/70 border-b px-4 py-3 md:px-6">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleLike}
+                className={`hover:bg-muted flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors ${
+                  post.viewer_liked ? "text-primary" : "text-muted-foreground"
+                }`}
+                disabled={likeMutation.isPending || unlikeMutation.isPending}
+                aria-label="点赞笔记"
+              >
+                <Heart className={`size-4 ${post.viewer_liked ? "fill-primary" : ""}`} />
+                {formatCount(post.like_count)}
+              </button>
+              <button
+                type="button"
+                onClick={handleCollection}
+                className={`hover:bg-muted flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors ${
+                  post.viewer_collected ? "text-primary" : "text-muted-foreground"
+                }`}
+                disabled={collectMutation.isPending || uncollectMutation.isPending}
+                aria-label="收藏笔记"
+              >
+                <Bookmark className={`size-4 ${post.viewer_collected ? "fill-primary" : ""}`} />
+                {formatCount(post.collect_count)}
+              </button>
+              <span className="text-muted-foreground ml-auto flex items-center gap-1.5 px-2 text-xs">
+                <MessageCircle className="size-4" />
+                {formatCount(post.comment_count)}
+              </span>
+              <button
+                type="button"
+                aria-label="分享笔记"
+                title="分享笔记"
+                className="text-muted-foreground hover:bg-muted flex size-8 items-center justify-center rounded-md transition-colors"
+              >
+                <Share2 className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="border-border/70 bg-background fixed inset-x-0 bottom-0 z-40 border-t px-3 py-2 shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.35)] md:static md:px-6 md:py-3 md:shadow-none">
+            <div className="flex items-center gap-2">
+              <Input
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void handleComment();
+                  }
+                }}
+                placeholder="说点什么..."
+                className="bg-muted focus-visible:bg-background h-9 flex-1 rounded-full border-transparent px-4 shadow-none"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => void handleComment()}
+                aria-label="发表评论"
+                title="发表评论"
+                disabled={createCommentMutation.isPending}
+              >
+                <Send className="text-primary size-4" />
+              </Button>
+            </div>
+          </div>
+
+          <Tabs defaultValue="comments" className="px-4 pt-3 md:px-6">
+            <TabsList variant="line" className="w-full justify-start gap-5">
+              <TabsTrigger value="comments" className="flex-none px-0">
+                评论 {post.comment_count}
+              </TabsTrigger>
+              <TabsTrigger value="related" className="flex-none px-0">
+                相关推荐
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="comments" className="mt-3 space-y-0">
+              {comments.length === 0 ? (
+                <p className="text-muted-foreground py-12 text-center text-sm">
+                  还没有评论,快来抢沙发
+                </p>
+              ) : (
+                comments.map((c) => (
+                  <div
+                    key={c.id}
+                    className="border-border/60 flex gap-3 border-b py-4 last:border-b-0"
+                  >
+                    <Avatar size="default" className="size-8">
+                      <AvatarImage src={c.author_avatar} />
+                      <AvatarFallback>{c.author_username.slice(0, 1)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-muted-foreground text-xs font-medium">
+                        {c.author_username}
+                      </p>
+                      <p className="mt-1 text-sm leading-6">{c.content}</p>
+                      <div className="text-muted-foreground mt-1.5 flex items-center gap-3 text-[11px]">
+                        <span>{c.created_at}</span>
+                        <button type="button" className="hover:text-foreground transition-colors">
+                          回复
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCommentLike(c.id, c.viewer_liked)}
+                      className={`flex min-w-8 flex-col items-center gap-0.5 pt-0.5 ${c.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
+                      aria-label="点赞评论"
+                      disabled={likeCommentMutation.isPending || unlikeCommentMutation.isPending}
+                    >
+                      <Heart className={`size-4 ${c.viewer_liked ? "fill-primary" : ""}`} />
+                      <span className="text-[10px] tabular-nums">{formatCount(c.like_count)}</span>
+                    </button>
+                  </div>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="related" className="mt-3 pb-5">
+              {related.length > 0 ? (
+                <MasonryFeed posts={related} />
+              ) : (
+                <p className="text-muted-foreground py-12 text-center text-sm">暂无推荐</p>
+              )}
+            </TabsContent>
+          </Tabs>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

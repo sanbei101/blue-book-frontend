@@ -135,6 +135,7 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
                     </label>
                     <Input
                       id="auth-username"
+                      name="username"
                       value={username}
                       onChange={(event) => setUsername(event.target.value)}
                       placeholder="请输入用户名"
@@ -150,6 +151,7 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
                     </label>
                     <Input
                       id="auth-password"
+                      name="password"
                       type="password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
@@ -167,6 +169,7 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
                       </label>
                       <Input
                         id="auth-confirm-password"
+                        name="confirm-password"
                         type="password"
                         value={confirmPassword}
                         onChange={(event) => setConfirmPassword(event.target.value)}
