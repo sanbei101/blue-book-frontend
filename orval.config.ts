@@ -8,8 +8,9 @@ export default defineConfig({
     output: {
       mode: "tags-split",
       target: "src/api",
-      client: "axios-functions",
+      client: "react-query",
       formatter: "oxfmt",
+      httpClient: "axios",
       override: {
         mutator: {
           path: "./src/mutator.ts",

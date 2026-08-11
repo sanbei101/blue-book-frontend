@@ -29,7 +29,7 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
 AXIOS_INSTANCE.interceptors.response.use(
   (response: AxiosResponse<{ code: number; msg: string; data?: unknown }>) => {
     const { code, msg, data } = response.data;
-    if (code !== 200) {
+    if (code < 200 || code >= 300) {
       throw new ApiError(msg, code, data);
     }
     return response;
@@ -44,16 +44,12 @@ AXIOS_INSTANCE.interceptors.response.use(
 );
 
 export const customInstance = <T>(
-  config: AxiosRequestConfig,
+  config: AxiosRequestConfig | string,
   options?: AxiosRequestConfig,
 ): Promise<T> => {
-  const source = Axios.CancelToken.source();
-
-  const promise = AXIOS_INSTANCE({
-    ...config,
-    ...options,
-    cancelToken: source.token,
-  }).then(({ data }) => data);
+  const requestConfig: AxiosRequestConfig =
+    typeof config === "string" ? { url: config, ...options } : { ...config, ...options };
+  const promise = AXIOS_INSTANCE(requestConfig).then(({ data }) => data);
 
   return promise;
 };
