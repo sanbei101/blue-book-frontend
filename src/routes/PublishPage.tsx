@@ -5,8 +5,8 @@ import { toast } from "sonner";
 
 import type { ApiCreateMediaItem } from "@/api/api.schemas";
 import { ApiCreateMediaItemMediaType } from "@/api/api.schemas";
-import { postMediaPresign } from "@/api/media/media";
-import { postPosts } from "@/api/posts/posts";
+import { usePostMediaPresign } from "@/api/media/media";
+import { usePostPosts } from "@/api/posts/posts";
 import { TopBar } from "@/components/layout/TopBar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,11 @@ export function PublishPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const presignMutation = usePostMediaPresign();
+  const createPostMutation = usePostPosts();
+  const isPublishing = uploading || createPostMutation.isPending;
 
   const handleFilesChange = (event: ChangeEvent<HTMLInputElement>) => {
     setMediaFiles(Array.from(event.target.files ?? []));
@@ -33,11 +35,11 @@ export function PublishPage() {
   const uploadMedia = async (files: File[]): Promise<ApiCreateMediaItem[]> => {
     return Promise.all(
       files.map(async (file, index) => {
-        const presignRes = await postMediaPresign({
-          content_type: file.type || "application/octet-stream",
+        const presignRes = await presignMutation.mutateAsync({
+          data: { content_type: file.type || "application/octet-stream" },
         });
-        const uploadUrl = presignRes.data?.upload_url;
-        const objectKey = presignRes.data?.object_key;
+        const uploadUrl = presignRes.upload_url;
+        const objectKey = presignRes.object_key;
         if (!uploadUrl || !objectKey) throw new Error("获取媒体上传地址失败");
 
         const uploadRes = await fetch(uploadUrl, {
@@ -51,7 +53,7 @@ export function PublishPage() {
           media_type: file.type.startsWith("video/")
             ? ApiCreateMediaItemMediaType.video
             : ApiCreateMediaItemMediaType.image,
-          media_url: objectKey,
+          media_key: objectKey,
           sort_order: index,
         };
       }),
@@ -60,20 +62,20 @@ export function PublishPage() {
 
   const handlePublish = async () => {
     if (!title.trim()) return;
-    setSubmitting(true);
     try {
       setUploading(mediaFiles.length > 0);
       const media = await uploadMedia(mediaFiles);
-      const res = await postPosts({ title: title.trim(), content: content.trim(), media });
+      const res = await createPostMutation.mutateAsync({
+        data: { title: title.trim(), content: content.trim(), media },
+      });
       toast.success("发布成功");
-      const id = res.data?.id;
+      const id = res.id;
       if (id) void navigate({ to: "/posts/$postId", params: { postId: id } });
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("发布失败");
     } finally {
       setUploading(false);
-      setSubmitting(false);
     }
   };
 
@@ -85,10 +87,10 @@ export function PublishPage() {
           <Button
             size="sm"
             className="rounded-full px-5"
-            disabled={!title.trim() || submitting}
+            disabled={!title.trim() || isPublishing}
             onClick={handlePublish}
           >
-            {uploading ? "上传中..." : submitting ? "发布中..." : "发布"}
+            {uploading ? "上传中..." : createPostMutation.isPending ? "发布中..." : "发布"}
           </Button>
         }
       />
@@ -129,7 +131,7 @@ export function PublishPage() {
           />
           <button
             type="button"
-            disabled={submitting}
+            disabled={isPublishing}
             onClick={() => fileInputRef.current?.click()}
             className="border-border bg-muted/30 text-muted-foreground hover:border-primary hover:text-primary flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors"
           >

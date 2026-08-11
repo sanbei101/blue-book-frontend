@@ -10,23 +10,26 @@
  */
 export interface ApiUserResponse {
   /** 头像地址 */
-  avatar_url?: string;
+  avatar_url: string;
   /** 个人简介 */
-  bio?: string;
+  bio: string;
   /** 用户 ID */
-  id?: string;
+  id: string;
   /** 用户名 */
-  username?: string;
+  username: string;
 }
 
 export interface ApiAuthResponse {
   /** Access token */
-  access_token?: string;
-  /** Access token 有效期,单位为秒 */
-  expires_in?: number;
+  access_token: string;
+  /**
+   * Access token 有效期,单位为秒
+   * @minimum 0
+   */
+  expires_in: number;
   /** Refresh token */
-  refresh_token?: string;
-  user?: ApiUserResponse;
+  refresh_token: string;
+  user: ApiUserResponse;
 }
 
 /**
@@ -34,11 +37,11 @@ export interface ApiAuthResponse {
  */
 export interface ApiAuthorResponse {
   /** 头像地址 */
-  avatar_url?: string;
+  avatar_url: string;
   /** 用户 ID */
   id: string;
   /** 用户名 */
-  username?: string;
+  username: string;
   /** 当前用户是否已关注作者 */
   viewer_following: boolean;
 }
@@ -71,13 +74,13 @@ export interface ApiCollectionStatusResponse {
 
 export interface ApiCommentResponse {
   /** 作者头像地址 */
-  author_avatar?: string;
+  author_avatar: string;
   /** 作者用户名 */
-  author_username?: string;
+  author_username: string;
   /** 评论内容 */
-  content?: string;
+  content: string;
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 评论 ID */
   id: string;
   /**
@@ -151,7 +154,7 @@ export interface ApiCreatePostRequest {
 
 export interface ApiCreatePostResponse {
   /** 帖子 ID */
-  id?: string;
+  id: string;
 }
 
 export interface ApiCreateTagRequest {
@@ -176,11 +179,11 @@ export interface ApiDeleteCommentResponse {
 
 export interface ApiFolderResponse {
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 收藏夹 ID */
-  id?: string;
+  id: string;
   /** 收藏夹名称 */
-  name?: string;
+  name: string;
 }
 
 export interface ApiFollowStatusResponse {
@@ -195,47 +198,59 @@ export interface ApiFollowStatusResponse {
 
 export interface ApiFollowUserResponse {
   /** 头像地址 */
-  avatar_url?: string;
+  avatar_url: string;
   /** 个人简介 */
-  bio?: string;
+  bio: string;
   /** 用户 ID */
   id: string;
   /** 用户名 */
-  username?: string;
+  username: string;
   /** 当前用户是否已关注 */
   viewer_following: boolean;
 }
 
 export interface ApiMediaResponse {
-  /** 图片高度 */
-  height?: number;
+  /**
+   * 图片高度
+   * @minimum 0
+   */
+  height: number;
   /** 媒体 ID */
-  id?: string;
+  id: string;
   /** 媒体类型 */
-  media_type?: string;
+  media_type: string;
   /** 媒体 CDN URL */
-  media_url?: string;
-  /** 排序序号 */
-  sort_order?: number;
-  /** 图片宽度 */
-  width?: number;
+  media_url: string;
+  /**
+   * 排序序号
+   * @minimum 0
+   */
+  sort_order: number;
+  /**
+   * 图片宽度
+   * @minimum 0
+   */
+  width: number;
 }
 
 export interface ApiTagResponse {
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 标签描述 */
-  description?: string;
+  description: string;
   /** 标签 ID */
-  id?: string;
+  id: string;
   /** 标签名称 */
-  name?: string;
-  /** 帖子数量 */
-  post_count?: number;
+  name: string;
+  /**
+   * 帖子数量
+   * @minimum 0
+   */
+  post_count: number;
 }
 
 export interface ApiGetPostsResponse {
-  author?: ApiAuthorResponse;
+  author: ApiAuthorResponse;
   /**
    * 收藏数
    * @minimum 0
@@ -247,9 +262,9 @@ export interface ApiGetPostsResponse {
    */
   comment_count: number;
   /** 内容 */
-  content?: string;
+  content: string;
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 帖子 ID */
   id: string;
   /**
@@ -258,11 +273,11 @@ export interface ApiGetPostsResponse {
    */
   like_count: number;
   /** 媒体列表 */
-  media?: ApiMediaResponse[];
+  media: ApiMediaResponse[];
   /** 标签列表 */
-  tags?: ApiTagResponse[];
+  tags: ApiTagResponse[];
   /** 标题 */
-  title?: string;
+  title: string;
   /**
    * 浏览量
    * @minimum 0
@@ -285,7 +300,7 @@ export interface ApiLikeStatusResponse {
 }
 
 export interface ApiListPostsItemResponse {
-  author?: ApiAuthorResponse;
+  author: ApiAuthorResponse;
   /**
    * 收藏数
    * @minimum 0
@@ -297,11 +312,11 @@ export interface ApiListPostsItemResponse {
    */
   comment_count: number;
   /** 内容 */
-  content?: string;
+  content: string;
   /** 封面 URL */
-  cover_url?: string;
+  cover_url: string;
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 帖子 ID */
   id: string;
   /**
@@ -310,7 +325,7 @@ export interface ApiListPostsItemResponse {
    */
   like_count: number;
   /** 标题 */
-  title?: string;
+  title: string;
   /**
    * 浏览量
    * @minimum 0
@@ -370,8 +385,8 @@ export interface ApiPageResponseApiListPostsItemResponse {
 }
 
 export interface ApiSearchHistoryResponse {
-  keyword?: string;
-  searched_at?: string;
+  keyword: string;
+  searched_at: string;
 }
 
 export interface ApiPageResponseApiSearchHistoryResponse {
@@ -396,17 +411,20 @@ export interface ApiPageResponseApiTagResponse {
 
 export interface ApiTopicResponse {
   /** 封面地址 */
-  cover_url?: string;
+  cover_url: string;
   /** 创建时间 */
-  created_at?: string;
+  created_at: string;
   /** 专题描述 */
-  description?: string;
+  description: string;
   /** 专题 ID */
-  id?: string;
+  id: string;
   /** 专题名称 */
-  name?: string;
-  /** 专题帖子数量 */
-  post_count?: number;
+  name: string;
+  /**
+   * 专题帖子数量
+   * @minimum 0
+   */
+  post_count: number;
 }
 
 export interface ApiPageResponseApiTopicResponse {
@@ -420,8 +438,9 @@ export interface ApiPageResponseApiTopicResponse {
 }
 
 export interface ApiTrendingSearchResponse {
-  keyword?: string;
-  search_count?: number;
+  keyword: string;
+  /** @minimum 0 */
+  search_count: number;
 }
 
 export interface ApiPageResponseApiTrendingSearchResponse {
@@ -440,12 +459,15 @@ export interface ApiPresignMediaRequest {
 }
 
 export interface ApiPresignMediaResponse {
-  /** 上传地址有效期,单位为秒 */
-  expires_in?: number;
+  /**
+   * 上传地址有效期,单位为秒
+   * @minimum 0
+   */
+  expires_in: number;
   /** 对象存储 key,发布帖子时作为媒体 URL 使用 */
-  object_key?: string;
+  object_key: string;
   /** 上传地址 */
-  upload_url?: string;
+  upload_url: string;
 }
 
 export interface ApiRefreshTokenRequest {
@@ -468,9 +490,9 @@ export interface ApiRegisterRequest {
 }
 
 export interface ApiSearchResponse {
-  posts?: ApiPageResponseApiListPostsItemResponse;
-  tags?: ApiPageResponseApiTagResponse;
-  users?: ApiPageResponseApiFollowUserResponse;
+  posts: ApiPageResponseApiListPostsItemResponse;
+  tags: ApiPageResponseApiTagResponse;
+  users: ApiPageResponseApiFollowUserResponse;
 }
 
 export interface ApiUpdateFolderRequest {

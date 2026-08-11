@@ -1,18 +1,11 @@
 import { Search, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useDeferredValue, useState } from "react";
 
-import type {
-  ApiListPostsItemResponse,
-  ApiSearchResponse,
-  ApiTopicResponse,
-  ApiTrendingSearchResponse,
-} from "@/api/api.schemas";
 import {
-  getFeedRecommended,
-  getSearch,
-  getSearchTrending,
-  getTopics,
+  useGetFeedRecommended,
+  useGetSearch,
+  useGetSearchTrending,
+  useGetTopics,
 } from "@/api/discovery/discovery";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
@@ -21,71 +14,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ApiError } from "@/mutator";
 
 export function ExplorePage() {
   const [query, setQuery] = useState("");
-  const [data, setData] = useState<ApiListPostsItemResponse[]>([]);
-  const [topics, setTopics] = useState<ApiTopicResponse[]>([]);
-  const [trending, setTrending] = useState<ApiTrendingSearchResponse[]>([]);
-  const [searchResults, setSearchResults] = useState<ApiSearchResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    Promise.all([
-      getSearchTrending({ limit: 8 }),
-      getTopics({ page: 1, page_size: 8 }),
-      getFeedRecommended({ page: 1, page_size: 6 }),
-    ])
-      .then(([trendingRes, topicsRes, feedRes]) => {
-        if (cancelled) return;
-        setTrending(trendingRes.data ?? []);
-        setTopics(topicsRes.data ?? []);
-        setData(feedRes.data ?? []);
-      })
-      .catch((err: unknown) => {
-        if (err instanceof ApiError) toast.error(err.msg);
-        else toast.error("加载推荐失败");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    const value = query.trim();
-    if (!value) {
-      setSearchResults(null);
-      return;
-    }
-
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      setLoading(true);
-      getSearch({ q: value, type: "all", page: 1, page_size: 20 })
-        .then((res) => {
-          if (!cancelled) setSearchResults(res.data ?? null);
-        })
-        .catch((err: unknown) => {
-          if (cancelled) return;
-          if (err instanceof ApiError) toast.error(err.msg);
-          else toast.error("搜索失败");
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
-        });
-    }, 300);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [query]);
+  const deferredQuery = useDeferredValue(query.trim());
+  const trendingQuery = useGetSearchTrending();
+  const topicsQuery = useGetTopics({ page: 1, page_size: 8 });
+  const recommendedQuery = useGetFeedRecommended({ page: 1, page_size: 6 });
+  const searchQuery = useGetSearch(
+    { q: deferredQuery, type: "all", page: 1, page_size: 20 },
+    { query: { enabled: Boolean(deferredQuery) } },
+  );
+  const trending = trendingQuery.data?.items ?? [];
+  const topics = topicsQuery.data?.items ?? [];
+  const recommendations = recommendedQuery.data?.items ?? [];
+  const searchResults = searchQuery.data;
+  const isSearching = Boolean(query.trim());
+  const loading = trendingQuery.isPending || topicsQuery.isPending || recommendedQuery.isPending;
 
   return (
     <>
@@ -148,10 +93,22 @@ export function ExplorePage() {
       </div>
 
       <div className="px-3 pt-4">
-        <h2 className="text-sm font-semibold">{searchResults ? "搜索结果" : "为你推荐"}</h2>
-        {searchResults ? (
-          searchResults.posts?.length ? (
-            <MasonryFeed posts={searchResults.posts} />
+        <h2 className="text-sm font-semibold">{isSearching ? "搜索结果" : "为你推荐"}</h2>
+        {isSearching ? (
+          searchQuery.isPending ? (
+            <div className="mt-2 space-y-2.5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
+                  <Skeleton className="size-20 shrink-0 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-3 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : searchResults?.posts?.items.length ? (
+            <MasonryFeed posts={searchResults.posts.items} />
           ) : (
             <p className="text-muted-foreground py-12 text-center text-sm">没有找到相关内容</p>
           )
@@ -167,7 +124,7 @@ export function ExplorePage() {
                     </div>
                   </Card>
                 ))
-              : data.slice(0, 3).map((p) => (
+              : recommendations.slice(0, 3).map((p) => (
                   <Card key={p.id} className="ring-foreground/5 flex gap-3 p-2.5 ring-1">
                     {p.cover_url ? (
                       <img

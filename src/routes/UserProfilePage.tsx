@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   BookOpen,
@@ -11,19 +11,13 @@ import {
   Heart,
   Bookmark,
 } from "lucide-react";
-import { type SubmitEvent, useEffect, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { toast } from "sonner";
 
-import type { ApiUserResponse, ApiListPostsItemResponse } from "@/api/api.schemas";
-import { postAuthLogin, postAuthRegister } from "@/api/auth/auth";
-import {
-  deleteUsersUserIdFollow,
-  getUsersUserIdFollowers,
-  getUsersUserIdFollowing,
-  putUsersUserIdFollow,
-} from "@/api/follows/follows";
-import { getPostsUserUserId } from "@/api/posts/posts";
-import { getUsersUserId } from "@/api/users/users";
+import { usePostAuthLogin, usePostAuthRegister } from "@/api/auth/auth";
+import { useDeleteUsersUserIdFollow, usePutUsersUserIdFollow } from "@/api/follows/follows";
+import { useGetUsersUserIdPosts } from "@/api/posts/posts";
+import { getGetMeProfileQueryKey, useGetUsersUserId } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -45,7 +39,9 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const loginMutation = usePostAuthLogin();
+  const registerMutation = usePostAuthRegister();
+  const submitting = loginMutation.isPending || registerMutation.isPending;
 
   const handleModeChange = (value: string) => {
     if (value === "login" || value === "register") {
@@ -71,16 +67,16 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
       return;
     }
 
-    setSubmitting(true);
     setError("");
     try {
-      const response =
+      const auth =
         mode === "login"
-          ? await postAuthLogin({ username: normalizedUsername, password })
-          : await postAuthRegister({ username: normalizedUsername, password });
-      const auth = response.data;
+          ? await loginMutation.mutateAsync({ data: { username: normalizedUsername, password } })
+          : await registerMutation.mutateAsync({
+              data: { username: normalizedUsername, password },
+            });
 
-      if (!auth?.access_token) {
+      if (!auth.access_token) {
         setError("登录凭证获取失败,请稍后重试");
         return;
       }
@@ -94,8 +90,6 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
       if (!onAuthenticated) void navigate({ to: "/me" });
     } catch (err) {
       setError(err instanceof ApiError ? err.msg : mode === "login" ? "登录失败" : "注册失败");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -210,54 +204,33 @@ export function AuthPage({ onAuthenticated }: { onAuthenticated?: (userId: strin
 }
 
 export function UserProfilePage({ userId }: { userId: string }) {
-  const [following, setFollowing] = useState(false);
-  const [user, setUser] = useState<ApiUserResponse | undefined>(undefined);
-  const [posts, setPosts] = useState<ApiListPostsItemResponse[]>([]);
-  const [followerCount, setFollowerCount] = useState<number | undefined>(undefined);
-  const [followingCount, setFollowingCount] = useState<number | undefined>(undefined);
-  const [userLoading, setUserLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    setUserLoading(true);
-    Promise.all([
-      getUsersUserId(userId),
-      getPostsUserUserId(userId),
-      getUsersUserIdFollowers(userId, { page: 1, page_size: 100 }),
-      getUsersUserIdFollowing(userId, { page: 1, page_size: 100 }),
-    ])
-      .then(([userRes, postsRes, followersRes, followingRes]) => {
-        if (cancelled) return;
-        setUser(userRes.data);
-        setPosts(postsRes.data ?? []);
-        setFollowerCount(followersRes.data?.length ?? 0);
-        setFollowingCount(followingRes.data?.length ?? 0);
-      })
-      .catch(() => {
-        if (!cancelled) setUser(undefined);
-      })
-      .finally(() => {
-        if (!cancelled) setUserLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
+  const queryClient = useQueryClient();
+  const userQuery = useGetUsersUserId(userId);
+  const user = userQuery.data;
+  const postsQuery = useGetUsersUserIdPosts(
+    userId,
+    { page: 1, page_size: 20 },
+    { query: { enabled: Boolean(user) } },
+  );
+  const followMutation = usePutUsersUserIdFollow();
+  const unfollowMutation = useDeleteUsersUserIdFollow();
+  const posts = postsQuery.data?.items ?? [];
+  const userLoading = userQuery.isPending || (Boolean(user) && postsQuery.isPending);
 
   const handleFollow = async () => {
-    const next = !following;
-    setFollowing(next);
+    if (!user) return;
+    const next = !user.viewer_following;
     try {
-      const response = next
-        ? await putUsersUserIdFollow(userId)
-        : await deleteUsersUserIdFollow(userId);
-      setFollowing(response.data?.following ?? next);
-      setFollowerCount(response.data?.follower_count ?? followerCount);
+      if (next) await followMutation.mutateAsync({ userId });
+      else await unfollowMutation.mutateAsync({ userId });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: userQuery.queryKey }),
+        queryClient.invalidateQueries({ queryKey: getGetMeProfileQueryKey() }),
+      ]);
       toast.success(next ? "已关注" : "已取消关注");
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("操作失败");
-      setFollowing(!next);
     }
   };
 
@@ -308,15 +281,15 @@ export function UserProfilePage({ userId }: { userId: string }) {
             <p className="text-muted-foreground mt-0.5 text-xs">小红书号: {user.id}</p>
             <div className="mt-2 flex items-center gap-4 text-sm">
               <span>
-                <span className="font-semibold">{formatCount(posts.length)}</span>{" "}
+                <span className="font-semibold">{formatCount(user.post_count)}</span>{" "}
                 <span className="text-muted-foreground text-xs">笔记</span>
               </span>
               <span>
-                <span className="font-semibold">{formatCount(followerCount)}</span>{" "}
+                <span className="font-semibold">{formatCount(user.follower_count)}</span>{" "}
                 <span className="text-muted-foreground text-xs">粉丝</span>
               </span>
               <span>
-                <span className="font-semibold">{formatCount(followingCount)}</span>{" "}
+                <span className="font-semibold">{formatCount(user.following_count)}</span>{" "}
                 <span className="text-muted-foreground text-xs">关注</span>
               </span>
             </div>
@@ -329,9 +302,10 @@ export function UserProfilePage({ userId }: { userId: string }) {
           <Button
             onClick={handleFollow}
             className="flex-1 rounded-full"
-            variant={following ? "outline" : "default"}
+            variant={user.viewer_following ? "outline" : "default"}
+            disabled={followMutation.isPending || unfollowMutation.isPending}
           >
-            {following ? "已关注" : "关注"}
+            {user.viewer_following ? "已关注" : "关注"}
           </Button>
           <Button variant="outline" className="flex-1 rounded-full">
             <MessageCircle className="mr-1 size-3.5" />
@@ -347,7 +321,7 @@ export function UserProfilePage({ userId }: { userId: string }) {
         <CardContent className="divide-border grid grid-cols-3 divide-x p-0">
           <KV label="获赞" value={formatCount(0)} />
           <KV label="收藏" value={formatCount(0)} />
-          <KV label="笔记" value={String((posts ?? []).length)} />
+          <KV label="笔记" value={String(user.post_count)} />
         </CardContent>
       </Card>
 
@@ -365,8 +339,8 @@ export function UserProfilePage({ userId }: { userId: string }) {
         </TabsList>
 
         <TabsContent value="posts" className="mt-0">
-          {(posts ?? []).length ? (
-            <MasonryFeed posts={posts ?? []} />
+          {posts.length ? (
+            <MasonryFeed posts={posts} />
           ) : (
             <EmptyState text="该用户还没有发布过笔记" />
           )}

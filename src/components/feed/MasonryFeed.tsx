@@ -1,18 +1,9 @@
+import type { ApiListPostsItemResponse } from "@/api/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { PostCard } from "./PostCard";
 
-type FeedItem = {
-  id?: string;
-  title?: string;
-  cover_url?: string;
-  view_count?: number;
-  like_count?: number;
-  comment_count?: number;
-  author?: { id?: string; username?: string; avatar_url?: string };
-};
-
-export function MasonryFeed({ posts }: { posts: FeedItem[] }) {
+export function MasonryFeed({ posts }: { posts: ApiListPostsItemResponse[] }) {
   return (
     <div className="columns-2 gap-2.5 px-2.5 py-2.5 md:columns-3 xl:columns-4">
       {posts.map((post) => (

@@ -1,16 +1,9 @@
 import { Settings, Share2, Edit3, Grid3x3, Bookmark, Heart, MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
-import type {
-  ApiCollectionItemResponse,
-  ApiListPostsItemResponse,
-  ApiUserResponse,
-} from "@/api/api.schemas";
-import { getAuthMe } from "@/api/auth/auth";
-import { getMeCollections } from "@/api/collections/collections";
-import { getUsersUserIdFollowers, getUsersUserIdFollowing } from "@/api/follows/follows";
-import { getPostsUserUserId } from "@/api/posts/posts";
+import { useGetMeCollections } from "@/api/collections/collections";
+import { useGetUsersUserIdPosts } from "@/api/posts/posts";
+import { useGetMeProfile } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,57 +13,29 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCount } from "@/lib/utils";
-import { ApiError } from "@/mutator";
 
 import { AuthPage } from "./UserProfilePage";
 
-const ME_KEY = "blue_book:me";
-
 export function ProfilePage() {
-  const [meId, setMeId] = useState<string | null>(() => localStorage.getItem(ME_KEY));
-  const [user, setUser] = useState<ApiUserResponse | undefined>(undefined);
-  const [posts, setPosts] = useState<ApiListPostsItemResponse[]>([]);
-  const [collections, setCollections] = useState<ApiCollectionItemResponse[]>([]);
-  const [followerCount, setFollowerCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-  const [userLoading, setUserLoading] = useState(false);
-
-  useEffect(() => {
-    if (!meId) {
-      setUser(undefined);
-      setPosts([]);
-      setCollections([]);
-      return;
-    }
-    let cancelled = false;
-    setUserLoading(true);
-    Promise.all([
-      getAuthMe(),
-      getPostsUserUserId(meId),
-      getMeCollections({ page: 1, page_size: 20 }),
-      getUsersUserIdFollowers(meId, { page: 1, page_size: 100 }),
-      getUsersUserIdFollowing(meId, { page: 1, page_size: 100 }),
-    ])
-      .then(([userRes, postsRes, collectionsRes, followersRes, followingRes]) => {
-        if (cancelled) return;
-        setUser(userRes.data);
-        setPosts(postsRes.data ?? []);
-        setCollections(collectionsRes.data ?? []);
-        setFollowerCount(followersRes.data?.length ?? 0);
-        setFollowingCount(followingRes.data?.length ?? 0);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        if (err instanceof ApiError) toast.error(err.msg);
-        else toast.error("加载资料失败");
-      })
-      .finally(() => {
-        if (!cancelled) setUserLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [meId]);
+  const [isAuthenticated, setIsAuthenticated] = useState(() =>
+    Boolean(localStorage.getItem("access_token")),
+  );
+  const profileQuery = useGetMeProfile({ query: { enabled: isAuthenticated } });
+  const user = profileQuery.data;
+  const postsQuery = useGetUsersUserIdPosts(
+    user?.id ?? "",
+    { page: 1, page_size: 20 },
+    { query: { enabled: Boolean(user?.id) } },
+  );
+  const collectionsQuery = useGetMeCollections(
+    { page: 1, page_size: 20 },
+    { query: { enabled: isAuthenticated } },
+  );
+  const posts = postsQuery.data?.items ?? [];
+  const collections = collectionsQuery.data?.items ?? [];
+  const userLoading =
+    profileQuery.isPending ||
+    (Boolean(user?.id) && (postsQuery.isPending || collectionsQuery.isPending));
 
   return (
     <>
@@ -89,8 +54,8 @@ export function ProfilePage() {
         }
       />
 
-      {!meId ? (
-        <AuthPage onAuthenticated={setMeId} />
+      {!isAuthenticated ? (
+        <AuthPage onAuthenticated={() => setIsAuthenticated(true)} />
       ) : userLoading ? (
         <div className="space-y-3 p-4">
           <Skeleton className="h-24 w-full rounded-2xl" />
@@ -125,17 +90,11 @@ export function ProfilePage() {
               </div>
 
               <div className="mt-3 flex items-center gap-5 text-sm">
-                <Stat label="关注" value={followingCount} />
+                <Stat label="关注" value={user.following_count} />
                 <Separator orientation="vertical" className="h-3" />
-                <Stat label="粉丝" value={followerCount} />
+                <Stat label="粉丝" value={user.follower_count} />
                 <Separator orientation="vertical" className="h-3" />
-                <Stat
-                  label="获赞与收藏"
-                  value={posts.reduce(
-                    (total, post) => total + (post.like_count ?? 0) + (post.collect_count ?? 0),
-                    0,
-                  )}
-                />
+                <Stat label="获赞与收藏" value={user.received_like_and_collect_count} />
               </div>
             </div>
           </div>
@@ -153,7 +112,7 @@ export function ProfilePage() {
           </div>
 
           <div className="mt-3 grid grid-cols-3 gap-1 px-3">
-            <StatCard Icon={Grid3x3} label="笔记" value={String((posts ?? []).length)} />
+            <StatCard Icon={Grid3x3} label="笔记" value={String(user.post_count)} />
             <StatCard Icon={Bookmark} label="收藏" value={String(collections.length)} />
             <StatCard Icon={Heart} label="赞过" value="—" />
           </div>
@@ -172,8 +131,8 @@ export function ProfilePage() {
             </TabsList>
 
             <TabsContent value="posts" className="mt-0">
-              {(posts ?? []).length ? (
-                <MasonryFeed posts={posts ?? []} />
+              {posts.length ? (
+                <MasonryFeed posts={posts} />
               ) : (
                 <p className="text-muted-foreground py-16 text-center text-sm">还没有发布过笔记</p>
               )}

@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -8,28 +9,24 @@ import {
   Send,
   Share2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import type {
-  ApiGetPostsResponse,
-  ApiCommentResponse,
-  ApiListPostsItemResponse,
-} from "@/api/api.schemas";
 import {
-  deletePostsPostIdCollection,
-  putPostsPostIdCollection,
+  useDeletePostsPostIdCollection,
+  usePutPostsPostIdCollection,
 } from "@/api/collections/collections";
-import { getPostsPostIdComments, postComments } from "@/api/comments/comments";
-import { getFeedRecommended } from "@/api/discovery/discovery";
-import { deleteUsersUserIdFollow, putUsersUserIdFollow } from "@/api/follows/follows";
+import { useGetPostsPostIdComments, usePostComments } from "@/api/comments/comments";
+import { useGetFeedRecommended } from "@/api/discovery/discovery";
+import { useDeleteUsersUserIdFollow, usePutUsersUserIdFollow } from "@/api/follows/follows";
 import {
-  deleteCommentsCommentIdLike,
-  deletePostsPostIdLike,
-  putCommentsCommentIdLike,
-  putPostsPostIdLike,
+  useDeleteCommentsCommentIdLike,
+  useDeletePostsPostIdLike,
+  usePutCommentsCommentIdLike,
+  usePutPostsPostIdLike,
 } from "@/api/likes/likes";
-import { getPostsPostId } from "@/api/posts/posts";
+import { useGetPostsPostId } from "@/api/posts/posts";
+import { getGetMeProfileQueryKey, getGetUsersUserIdQueryKey } from "@/api/users/users";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -43,100 +40,72 @@ import { formatCount } from "@/lib/utils";
 import { ApiError } from "@/mutator";
 
 export function PostDetailPage({ postId }: { postId: string }) {
+  const queryClient = useQueryClient();
   const [activeImage, setActiveImage] = useState(0);
-  const [liked, setLiked] = useState(false);
-  const [collected, setCollected] = useState(false);
-  const [following, setFollowing] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [collectCount, setCollectCount] = useState(0);
   const [comment, setComment] = useState("");
-  const [commentLikes, setCommentLikes] = useState<Record<string, boolean>>({});
-  const [post, setPost] = useState<ApiGetPostsResponse | undefined>(undefined);
-  const [comments, setComments] = useState<ApiCommentResponse[]>([]);
   const [coverRatio, setCoverRatio] = useState<number | null>(null);
-  const [related, setRelated] = useState<ApiListPostsItemResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const postQuery = useGetPostsPostId(postId);
+  const commentsQuery = useGetPostsPostIdComments(postId, { page: 1, page_size: 20 });
+  const relatedQuery = useGetFeedRecommended({ page: 1, page_size: 6 });
+  const likeMutation = usePutPostsPostIdLike();
+  const unlikeMutation = useDeletePostsPostIdLike();
+  const collectMutation = usePutPostsPostIdCollection();
+  const uncollectMutation = useDeletePostsPostIdCollection();
+  const followMutation = usePutUsersUserIdFollow();
+  const unfollowMutation = useDeleteUsersUserIdFollow();
+  const createCommentMutation = usePostComments();
+  const likeCommentMutation = usePutCommentsCommentIdLike();
+  const unlikeCommentMutation = useDeleteCommentsCommentIdLike();
+  const post = postQuery.data;
+  const comments = commentsQuery.data?.items ?? [];
+  const related = relatedQuery.data?.items ?? [];
 
   const handleImageSelect = (i: number) => {
     setActiveImage(i);
     setCoverRatio(null);
   };
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    Promise.all([
-      getPostsPostId(postId),
-      getPostsPostIdComments(postId),
-      getFeedRecommended({ page: 1, page_size: 6 }),
-    ])
-      .then(([postRes, commentsRes, relatedRes]) => {
-        if (cancelled) return;
-        setPost(postRes.data);
-        setLiked(postRes.data?.liked ?? false);
-        setCollected(postRes.data?.collected ?? false);
-        setLikeCount(postRes.data?.like_count ?? 0);
-        setCollectCount(postRes.data?.collect_count ?? 0);
-        setComments(commentsRes.data ?? []);
-        setRelated(relatedRes.data ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setPost(undefined);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [postId]);
-
   const handleLike = async () => {
-    const next = !liked;
-    setLiked(next);
+    if (!post) return;
+    const next = !post.viewer_liked;
     try {
-      const response = next
-        ? await putPostsPostIdLike(postId)
-        : await deletePostsPostIdLike(postId);
-      setLiked(response.data?.liked ?? next);
-      setLikeCount(response.data?.like_count ?? likeCount);
+      if (next) await likeMutation.mutateAsync({ postId });
+      else await unlikeMutation.mutateAsync({ postId });
+      await queryClient.invalidateQueries({ queryKey: postQuery.queryKey });
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("操作失败");
-      setLiked(!next);
     }
   };
 
   const handleCollection = async () => {
-    const next = !collected;
-    setCollected(next);
+    if (!post) return;
+    const next = !post.viewer_collected;
     try {
-      const response = next
-        ? await putPostsPostIdCollection(postId)
-        : await deletePostsPostIdCollection(postId);
-      setCollected(response.data?.collected ?? next);
-      setCollectCount(response.data?.collect_count ?? collectCount);
+      if (next) await collectMutation.mutateAsync({ postId });
+      else await uncollectMutation.mutateAsync({ postId });
+      await queryClient.invalidateQueries({ queryKey: postQuery.queryKey });
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("操作失败");
-      setCollected(!next);
     }
   };
 
   const handleFollow = async () => {
-    const authorId = post?.author?.id;
-    if (!authorId) return;
-    const next = !following;
-    setFollowing(next);
+    const author = post?.author;
+    if (!author) return;
+    const next = !author.viewer_following;
     try {
-      const response = next
-        ? await putUsersUserIdFollow(authorId)
-        : await deleteUsersUserIdFollow(authorId);
-      setFollowing(response.data?.following ?? next);
+      if (next) await followMutation.mutateAsync({ userId: author.id });
+      else await unfollowMutation.mutateAsync({ userId: author.id });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: postQuery.queryKey }),
+        queryClient.invalidateQueries({ queryKey: getGetUsersUserIdQueryKey(author.id) }),
+        queryClient.invalidateQueries({ queryKey: getGetMeProfileQueryKey() }),
+      ]);
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("操作失败");
-      setFollowing(!next);
     }
   };
 
@@ -144,9 +113,11 @@ export function PostDetailPage({ postId }: { postId: string }) {
     const content = comment.trim();
     if (!content) return;
     try {
-      await postComments({ post_id: postId, content });
-      const response = await getPostsPostIdComments(postId);
-      setComments(response.data ?? []);
+      await createCommentMutation.mutateAsync({ data: { post_id: postId, content } });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: commentsQuery.queryKey }),
+        queryClient.invalidateQueries({ queryKey: postQuery.queryKey }),
+      ]);
       setComment("");
       toast.success("评论成功");
     } catch (err) {
@@ -155,29 +126,20 @@ export function PostDetailPage({ postId }: { postId: string }) {
     }
   };
 
-  const handleCommentLike = async (commentId: string) => {
+  const handleCommentLike = async (commentId: string, viewerLiked: boolean) => {
     if (!commentId) return;
-    const next = !commentLikes[commentId];
-    setCommentLikes((current) => ({ ...current, [commentId]: next }));
+    const next = !viewerLiked;
     try {
-      const response = next
-        ? await putCommentsCommentIdLike(commentId)
-        : await deleteCommentsCommentIdLike(commentId);
-      setComments((current) =>
-        current.map((item) =>
-          item.id === commentId
-            ? { ...item, like_count: response.data?.like_count ?? item.like_count }
-            : item,
-        ),
-      );
+      if (next) await likeCommentMutation.mutateAsync({ commentId });
+      else await unlikeCommentMutation.mutateAsync({ commentId });
+      await queryClient.invalidateQueries({ queryKey: commentsQuery.queryKey });
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
       else toast.error("操作失败");
-      setCommentLikes((current) => ({ ...current, [commentId]: !next }));
     }
   };
 
-  if (loading || !post) {
+  if (postQuery.isPending || !post) {
     return (
       <div className="space-y-3 p-3">
         <Skeleton className="aspect-[3/4] w-full rounded-none" />
@@ -275,10 +237,11 @@ export function PostDetailPage({ postId }: { postId: string }) {
           <Button
             size="sm"
             className="rounded-full px-5"
-            variant={following ? "outline" : "default"}
+            variant={post.author?.viewer_following ? "outline" : "default"}
             onClick={handleFollow}
+            disabled={followMutation.isPending || unfollowMutation.isPending}
           >
-            {following ? "已关注" : "关注"}
+            {post.author?.viewer_following ? "已关注" : "关注"}
           </Button>
         </CardContent>
       </Card>
@@ -299,15 +262,15 @@ export function PostDetailPage({ postId }: { postId: string }) {
 
       <Tabs defaultValue="comments" className="px-3 pt-2">
         <TabsList variant="line" className="w-full justify-start gap-4">
-          <TabsTrigger value="comments">评论 {comments?.length ?? 0}</TabsTrigger>
+          <TabsTrigger value="comments">评论 {post.comment_count}</TabsTrigger>
           <TabsTrigger value="related">相关推荐</TabsTrigger>
         </TabsList>
 
         <TabsContent value="comments" className="mt-2 space-y-0 pb-24">
-          {(comments ?? []).length === 0 ? (
+          {comments.length === 0 ? (
             <p className="text-muted-foreground py-10 text-center text-sm">还没有评论,快来抢沙发</p>
           ) : (
-            (comments ?? []).map((c) => (
+            comments.map((c) => (
               <div key={c.id} className="flex gap-2.5 py-2.5">
                 <Avatar size="default">
                   <AvatarImage src={c.author_avatar} />
@@ -322,11 +285,12 @@ export function PostDetailPage({ postId }: { postId: string }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleCommentLike(c.id ?? "")}
-                  className={`flex flex-col items-center gap-0.5 ${commentLikes[c.id ?? ""] ? "text-primary" : "text-muted-foreground"}`}
+                  onClick={() => handleCommentLike(c.id, c.viewer_liked)}
+                  className={`flex flex-col items-center gap-0.5 ${c.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
                   aria-label="点赞评论"
+                  disabled={likeCommentMutation.isPending || unlikeCommentMutation.isPending}
                 >
-                  <Heart className={`size-4 ${commentLikes[c.id ?? ""] ? "fill-primary" : ""}`} />
+                  <Heart className={`size-4 ${c.viewer_liked ? "fill-primary" : ""}`} />
                   <span className="text-[10px]">{formatCount(c.like_count)}</span>
                 </button>
               </div>
@@ -360,27 +324,30 @@ export function PostDetailPage({ postId }: { postId: string }) {
           onClick={() => void handleComment()}
           className="text-primary flex items-center gap-1 text-xs"
           aria-label="发表评论"
+          disabled={createCommentMutation.isPending}
         >
           <Send className="size-5" />
         </button>
         <button
           onClick={handleLike}
-          className={`flex items-center gap-1 text-xs ${liked ? "text-primary" : "text-muted-foreground"}`}
+          className={`flex items-center gap-1 text-xs ${post.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
+          disabled={likeMutation.isPending || unlikeMutation.isPending}
         >
-          <Heart className={`size-5 ${liked ? "fill-primary" : ""}`} />
-          {formatCount(likeCount)}
+          <Heart className={`size-5 ${post.viewer_liked ? "fill-primary" : ""}`} />
+          {formatCount(post.like_count)}
         </button>
         <button
           onClick={handleCollection}
-          className={`flex items-center gap-1 text-xs ${collected ? "text-primary" : "text-muted-foreground"}`}
+          className={`flex items-center gap-1 text-xs ${post.viewer_collected ? "text-primary" : "text-muted-foreground"}`}
           aria-label="收藏帖子"
+          disabled={collectMutation.isPending || uncollectMutation.isPending}
         >
-          <Bookmark className={`size-5 ${collected ? "fill-primary" : ""}`} />
-          {formatCount(collectCount)}
+          <Bookmark className={`size-5 ${post.viewer_collected ? "fill-primary" : ""}`} />
+          {formatCount(post.collect_count)}
         </button>
         <button className="text-muted-foreground flex items-center gap-1 text-xs">
           <MessageCircle className="size-5" />
-          {comments?.length ?? 0}
+          {post.comment_count}
         </button>
         <button className="text-muted-foreground flex items-center gap-1 text-xs">
           <Share2 className="size-5" />

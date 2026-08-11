@@ -14,6 +14,8 @@ export class ApiError extends Error {
   }
 }
 
+type ApiPayload<T> = T extends { data?: infer TData } ? TData : void;
+
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: "/api/v1",
 });
@@ -46,10 +48,10 @@ AXIOS_INSTANCE.interceptors.response.use(
 export const customInstance = <T>(
   config: AxiosRequestConfig | string,
   options?: AxiosRequestConfig,
-): Promise<T> => {
+): Promise<ApiPayload<T>> => {
   const requestConfig: AxiosRequestConfig =
     typeof config === "string" ? { url: config, ...options } : { ...config, ...options };
-  const promise = AXIOS_INSTANCE(requestConfig).then(({ data }) => data);
+  const promise = AXIOS_INSTANCE(requestConfig).then(({ data }) => data.data as ApiPayload<T>);
 
   return promise;
 };
