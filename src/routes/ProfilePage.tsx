@@ -1,5 +1,5 @@
 import { Settings, Share2, Edit3, Grid3x3, Bookmark, Heart, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useGetMeCollections } from "@/api/collections/collections";
 import { useGetUsersUserIdPosts } from "@/api/posts/posts";
@@ -20,6 +20,11 @@ export function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(() =>
     Boolean(localStorage.getItem("access_token")),
   );
+  useEffect(() => {
+    const handleSessionExpired = () => setIsAuthenticated(false);
+    window.addEventListener("blue_book:session-expired", handleSessionExpired);
+    return () => window.removeEventListener("blue_book:session-expired", handleSessionExpired);
+  }, []);
   const profileQuery = useGetMeProfile({ query: { enabled: isAuthenticated } });
   const user = profileQuery.data;
   const postsQuery = useGetUsersUserIdPosts(
