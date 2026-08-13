@@ -7,7 +7,7 @@ export function MasonryFeed({ posts }: { posts: ApiListPostsItemResponse[] }) {
   return (
     <div className="columns-2 gap-3 px-2 py-2 md:columns-3 xl:columns-4">
       {posts.map((post) => (
-        <div key={post.id} className="mb-3 break-inside-avoid">
+        <div key={post.id} className="mb-3 min-w-0 break-inside-avoid">
           <PostCard post={post} />
         </div>
       ))}

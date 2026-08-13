@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, ImageOff } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import type { ApiListPostsItemResponse as CardProps } from "@/api/api.schemas";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,35 +11,26 @@ type PostCardProps = {
   post: CardProps;
 };
 
-function getVisualAspectRatio(id: string, width?: number, height?: number) {
-  if (!width || !height || width <= 0 || height <= 0) return 0.75;
-
-  const realRatio = width / height;
-
-  if (Math.abs(realRatio - 0.75) < 0.02) {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
-
-    const VARIANTS = [0.58, 0.82, 0.7, 1.0, 0.62, 0.75];
-    return VARIANTS[Math.abs(hash) % VARIANTS.length];
-  }
-
-  return Math.max(0.55, Math.min(realRatio, 1.25));
-}
-
 export function PostCard({ post }: PostCardProps) {
   const { id, title, width, height, cover_url, author, like_count, viewer_liked } = post;
   const [imgFailed, setImgFailed] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const aspectRatio = useMemo(() => getVisualAspectRatio(id, width, height), [id, width, height]);
+  const aspectRatio = width > 0 && height > 0 ? `${width} / ${height}` : "3 / 4";
 
   return (
-    <Card className="group border-border/40 bg-card overflow-hidden rounded-xl border p-0 shadow-none transition-all duration-200 hover:shadow-md">
-      <Link to="/posts/$postId" params={{ postId: id }} className="block w-full overflow-hidden">
+    <Card className="group border-border/40 bg-card w-full min-w-0 overflow-hidden rounded-xl border p-0 shadow-none transition-all duration-200 hover:shadow-md">
+      <Link
+        to="/posts/$postId"
+        params={{ postId: id }}
+        className="block w-full max-w-full overflow-hidden"
+      >
         {/* 占位与裁剪容器 */}
-        <div className="bg-muted relative w-full overflow-hidden" style={{ aspectRatio }}>
+        <div
+          className="bg-muted relative w-full max-w-full overflow-hidden"
+          style={{ aspectRatio }}
+        >
           {cover_url && !imgFailed ? (
             <img
               src={cover_url}
@@ -49,7 +40,7 @@ export function PostCard({ post }: PostCardProps) {
               onLoad={() => setIsLoaded(true)}
               onError={() => setImgFailed(true)}
               className={cn(
-                "block size-full object-cover transition-all duration-300 ease-out group-hover:scale-105",
+                "block h-full w-full max-w-full object-cover transition-all duration-300 ease-out group-hover:scale-105",
                 isLoaded ? "opacity-100" : "opacity-0",
               )}
             />
