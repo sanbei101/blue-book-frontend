@@ -11,7 +11,14 @@ import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -36,16 +43,18 @@ export function ExplorePage() {
     <>
       <TopBar title="探索" showSearch={false} />
       <div className="px-3 pt-2">
-        <div className="relative">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-          <Input
+        <InputGroup className="bg-muted rounded-full border-0">
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索感兴趣的内容或用户"
-            className="bg-muted h-9 rounded-full pl-9 text-sm"
+            className="text-sm"
             autoFocus
           />
-        </div>
+        </InputGroup>
       </div>
 
       <div className="mt-3 px-3">
@@ -108,7 +117,15 @@ export function ExplorePage() {
           ) : searchResults?.posts.items.length ? (
             <MasonryFeed posts={searchResults.posts.items} />
           ) : (
-            <p className="text-muted-foreground py-12 text-center text-sm">没有找到相关内容</p>
+            <Empty className="py-12">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Search />
+                </EmptyMedia>
+                <EmptyTitle>没有找到相关内容</EmptyTitle>
+                <EmptyDescription>试试其他关键词</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )
         ) : (
           <div className="mt-2 space-y-2.5">

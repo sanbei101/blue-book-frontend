@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { cn } from "@/lib/utils";
 
 type TopBarProps = {
@@ -31,14 +31,16 @@ export function TopBar({ title, showSearch = true, rightSlot, className }: TopBa
 
       {showSearch && (
         <Link to="/explore" className="ml-2 max-w-sm flex-1 md:max-w-md">
-          <div className="relative">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-            <Input
+          <InputGroup className="bg-muted h-8 rounded-full border-0">
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupInput
               readOnly
               placeholder="搜索你感兴趣的内容"
-              className="bg-muted h-8 cursor-pointer rounded-full pl-8 text-sm"
+              className="cursor-pointer text-sm"
             />
-          </div>
+          </InputGroup>
         </Link>
       )}
 

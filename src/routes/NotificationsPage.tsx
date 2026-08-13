@@ -1,8 +1,9 @@
-import { Bell } from "lucide-react";
+import { Bell, Inbox } from "lucide-react";
 
 import { TopBar } from "@/components/layout/TopBar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -69,11 +70,13 @@ export function NotificationsPage() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-12">
-      <Avatar size="lg" className="bg-muted">
-        <AvatarFallback>📭</AvatarFallback>
-      </Avatar>
-      <p className="text-sm">{text}</p>
-    </div>
+    <Empty className="py-12">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Inbox />
+        </EmptyMedia>
+        <EmptyTitle>{text}</EmptyTitle>
+      </EmptyHeader>
+    </Empty>
   );
 }
