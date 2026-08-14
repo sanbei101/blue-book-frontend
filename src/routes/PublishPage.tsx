@@ -8,16 +8,6 @@ import { ApiCreateMediaItemMediaType } from "@/api/api.schemas";
 import { usePostMediaPresign } from "@/api/media/media";
 import { usePostPosts } from "@/api/posts/posts";
 import { TopBar } from "@/components/layout/TopBar";
-import {
-  Attachment,
-  AttachmentAction,
-  AttachmentActions,
-  AttachmentContent,
-  AttachmentDescription,
-  AttachmentGroup,
-  AttachmentMedia,
-  AttachmentTitle,
-} from "@/components/ui/attachment";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -160,59 +150,61 @@ export function PublishPage() {
 
       <div className="px-3">
         <h3 className="mb-2 text-sm font-medium">添加图片 / 视频</h3>
-        <div className="flex gap-3 overflow-x-auto py-1">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
           <input
             id="publish-media"
             type="file"
             accept="image/*,video/*"
             multiple
             className="sr-only"
+            disabled={isPublishing}
             onChange={handleFilesChange}
           />
           <label
             htmlFor="publish-media"
             aria-disabled={isPublishing}
-            className="border-border bg-muted/30 text-muted-foreground hover:border-primary hover:text-primary flex size-24 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed transition-colors"
+            className="border-border bg-muted/30 text-muted-foreground hover:border-primary hover:text-primary flex aspect-square w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors aria-disabled:pointer-events-none aria-disabled:opacity-50"
           >
             <ImagePlus className="size-6" />
             <span className="text-xs">添加</span>
           </label>
-          {mediaFiles.length > 0 && (
-            <AttachmentGroup>
-              {mediaFiles.map((file, index) => {
-                const previewUrl = previewUrls[index];
-                const isVideo = file.type.startsWith("video/");
-                return (
-                  <Attachment key={`${file.name}-${file.lastModified}`} orientation="vertical">
-                    <AttachmentMedia>
-                      {previewUrl &&
-                        (isVideo ? (
-                          <video src={previewUrl} muted preload="metadata" />
-                        ) : (
-                          <img src={previewUrl} alt={file.name} />
-                        ))}
-                      {isVideo ? (
-                        <Video className="absolute size-5 text-white drop-shadow" />
-                      ) : null}
-                    </AttachmentMedia>
-                    <AttachmentContent className="w-full px-2 pb-2">
-                      <AttachmentTitle>{file.name}</AttachmentTitle>
-                      <AttachmentDescription>{isVideo ? "视频" : "图片"}</AttachmentDescription>
-                    </AttachmentContent>
-                    <AttachmentActions>
-                      <AttachmentAction
-                        aria-label={`移除 ${file.name}`}
-                        disabled={isPublishing}
-                        onClick={() => removeMedia(index)}
-                      >
-                        <X />
-                      </AttachmentAction>
-                    </AttachmentActions>
-                  </Attachment>
-                );
-              })}
-            </AttachmentGroup>
-          )}
+          {mediaFiles.map((file, index) => {
+            const previewUrl = previewUrls[index];
+            const isVideo = file.type.startsWith("video/");
+            return (
+              <div
+                key={`${file.name}-${file.lastModified}`}
+                className="bg-muted relative aspect-square min-w-0 overflow-hidden rounded-lg border"
+              >
+                {previewUrl &&
+                  (isVideo ? (
+                    <video
+                      src={previewUrl}
+                      muted
+                      preload="metadata"
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <img src={previewUrl} alt={file.name} className="size-full object-cover" />
+                  ))}
+                {isVideo && (
+                  <span className="absolute bottom-2 left-2 rounded-md bg-black/60 p-1 text-white">
+                    <Video className="size-3.5" />
+                  </span>
+                )}
+                <Button
+                  variant="secondary"
+                  size="icon-xs"
+                  className="absolute top-1 right-1 rounded-full shadow-sm"
+                  aria-label={`移除 ${file.name}`}
+                  disabled={isPublishing}
+                  onClick={() => removeMedia(index)}
+                >
+                  <X />
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </div>
 
