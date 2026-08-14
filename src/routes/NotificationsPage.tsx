@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatRelativeTime } from "@/lib/utils";
 import { ApiError } from "@/mutator";
 
 import { AuthPage } from "./UserProfilePage";
@@ -186,7 +187,7 @@ function NotificationItem({
           <span className="text-muted-foreground font-normal">{meta.text}</span>
         </p>
         <p className="text-muted-foreground mt-1 text-xs">
-          {formatNotificationTime(notification.created_at)}
+          {formatRelativeTime(notification.created_at)}
         </p>
       </div>
       {!notification.read_at && <span className="bg-primary size-2 shrink-0 rounded-full" />}
@@ -220,11 +221,5 @@ function NotificationEmpty({ text }: { text: string }) {
         <EmptyTitle>{text}</EmptyTitle>
       </EmptyHeader>
     </Empty>
-  );
-}
-
-function formatNotificationTime(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(value),
   );
 }

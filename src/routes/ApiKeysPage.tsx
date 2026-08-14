@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatRelativeTime } from "@/lib/utils";
 import { ApiError } from "@/mutator";
 
 import { AuthPage } from "./UserProfilePage";
@@ -202,8 +203,8 @@ function ApiKeyItem({ apiKey, onRevoke }: { apiKey: ApiApiKeyResponse; onRevoke:
           </div>
           <p className="text-muted-foreground mt-1 font-mono text-xs">{apiKey.key_prefix}...</p>
           <p className="text-muted-foreground mt-1 text-xs">
-            创建于 {formatDate(apiKey.created_at)}
-            {apiKey.last_used_at && ` · 最近使用 ${formatDate(apiKey.last_used_at)}`}
+            创建于 {formatRelativeTime(apiKey.created_at)}
+            {apiKey.last_used_at && ` · 最近使用 ${formatRelativeTime(apiKey.last_used_at)}`}
           </p>
         </div>
         {!revoked && (
@@ -219,8 +220,4 @@ function ApiKeyItem({ apiKey, onRevoke }: { apiKey: ApiApiKeyResponse; onRevoke:
       </CardContent>
     </Card>
   );
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium" }).format(new Date(value));
 }

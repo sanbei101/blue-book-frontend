@@ -43,7 +43,7 @@ import { InputGroup, InputGroupButton, InputGroupInput } from "@/components/ui/i
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { formatCount } from "@/lib/utils";
+import { formatCount, formatRelativeTime } from "@/lib/utils";
 import { ApiError } from "@/mutator";
 
 export function PostDetailPage({ postId }: { postId: string }) {
@@ -51,7 +51,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
   const [activeImage, setActiveImage] = useState(0);
   const [comment, setComment] = useState("");
   const [coverRatio, setCoverRatio] = useState<number | null>(null);
-  const postQuery = useGetPostsPostId(postId);
+  const postQuery = useGetPostsPostId(postId, { query: { staleTime: 0 } });
   const commentsQuery = useGetPostsPostIdComments(postId, { page: 1, page_size: 20 });
   const relatedQuery = useGetFeedRecommended({ page: 1, page_size: 6 });
   const likeMutation = usePutPostsPostIdLike();
@@ -277,7 +277,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
                   {author.username}
                 </Link>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  {post.created_at} · {formatCount(post.view_count)} 浏览
+                  {formatRelativeTime(post.created_at)} · {formatCount(post.view_count)} 浏览
                 </p>
               </div>
               <Button
@@ -418,7 +418,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
                         </p>
                         <p className="mt-1 text-sm leading-6">{c.content}</p>
                         <div className="text-muted-foreground mt-1.5 flex items-center gap-3 text-[11px]">
-                          <span>{c.created_at}</span>
+                          <span>{formatRelativeTime(c.created_at)}</span>
                           <button type="button" className="hover:text-foreground transition-colors">
                             回复
                           </button>
