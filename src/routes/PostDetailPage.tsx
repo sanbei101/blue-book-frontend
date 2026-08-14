@@ -9,10 +9,12 @@ import {
   MoreHorizontal,
   Send,
   Share2,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import type { ApiCommentResponse } from "@/api/api.schemas";
 import {
   useDeletePostsPostIdCollection,
   usePutPostsPostIdCollection,
@@ -43,13 +45,14 @@ import { InputGroup, InputGroupButton, InputGroupInput } from "@/components/ui/i
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { formatCount, formatRelativeTime } from "@/lib/utils";
+import { cn, formatCount, formatRelativeTime } from "@/lib/utils";
 import { ApiError } from "@/mutator";
 
 export function PostDetailPage({ postId }: { postId: string }) {
   const queryClient = useQueryClient();
   const [activeImage, setActiveImage] = useState(0);
   const [comment, setComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<{ id: string; username: string } | null>(null);
   const [coverRatio, setCoverRatio] = useState<number | null>(null);
   const postQuery = useGetPostsPostId(postId, { query: { staleTime: 0 } });
   const commentsQuery = useGetPostsPostIdComments(postId, { page: 1, page_size: 20 });
@@ -65,6 +68,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
   const unlikeCommentMutation = useDeleteCommentsCommentIdLike();
   const post = postQuery.data;
   const comments = commentsQuery.data?.items ?? [];
+  const commentTree = buildCommentTree(comments);
   const related = relatedQuery.data?.items ?? [];
 
   const handleImageSelect = (i: number) => {
@@ -120,12 +124,19 @@ export function PostDetailPage({ postId }: { postId: string }) {
     const content = comment.trim();
     if (!content) return;
     try {
-      await createCommentMutation.mutateAsync({ data: { post_id: postId, content } });
+      await createCommentMutation.mutateAsync({
+        data: {
+          post_id: postId,
+          content,
+          ...(replyingTo ? { parent_id: replyingTo.id } : {}),
+        },
+      });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: commentsQuery.queryKey }),
         queryClient.invalidateQueries({ queryKey: postQuery.queryKey }),
       ]);
       setComment("");
+      setReplyingTo(null);
       toast.success("评论成功");
     } catch (err) {
       if (err instanceof ApiError) toast.error(err.msg);
@@ -367,7 +378,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
                       void handleComment();
                     }
                   }}
-                  placeholder="说点什么..."
+                  placeholder={replyingTo ? `回复 @${replyingTo.username}` : "说点什么..."}
                 />
                 <InputGroupButton
                   onClick={() => void handleComment()}
@@ -378,6 +389,17 @@ export function PostDetailPage({ postId }: { postId: string }) {
                   <Send className="text-primary" />
                 </InputGroupButton>
               </InputGroup>
+              {replyingTo && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="取消回复"
+                  title="取消回复"
+                  onClick={() => setReplyingTo(null)}
+                >
+                  <X />
+                </Button>
+              )}
             </div>
           </div>
 
@@ -403,40 +425,14 @@ export function PostDetailPage({ postId }: { postId: string }) {
                     </EmptyHeader>
                   </Empty>
                 ) : (
-                  comments.map((c) => (
-                    <div
-                      key={c.id}
-                      className="border-border/60 flex gap-3 border-b py-4 last:border-b-0"
-                    >
-                      <Avatar size="default" className="size-8">
-                        <AvatarImage src={c.author_avatar} />
-                        <AvatarFallback>{c.author_username.slice(0, 1)}</AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-muted-foreground text-xs font-medium">
-                          {c.author_username}
-                        </p>
-                        <p className="mt-1 text-sm leading-6">{c.content}</p>
-                        <div className="text-muted-foreground mt-1.5 flex items-center gap-3 text-[11px]">
-                          <span>{formatRelativeTime(c.created_at)}</span>
-                          <button type="button" className="hover:text-foreground transition-colors">
-                            回复
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCommentLike(c.id, c.viewer_liked)}
-                        className={`flex min-w-8 flex-col items-center gap-0.5 pt-0.5 ${c.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
-                        aria-label="点赞评论"
-                        disabled={likeCommentMutation.isPending || unlikeCommentMutation.isPending}
-                      >
-                        <Heart className={`size-4 ${c.viewer_liked ? "fill-primary" : ""}`} />
-                        <span className="text-[10px] tabular-nums">
-                          {formatCount(c.like_count)}
-                        </span>
-                      </button>
-                    </div>
+                  commentTree.map((comment) => (
+                    <CommentItem
+                      key={comment.id}
+                      comment={comment}
+                      onReply={(id, username) => setReplyingTo({ id, username })}
+                      onLike={handleCommentLike}
+                      liking={likeCommentMutation.isPending || unlikeCommentMutation.isPending}
+                    />
                   ))
                 )}
               </ScrollArea>
@@ -462,5 +458,82 @@ export function PostDetailPage({ postId }: { postId: string }) {
         </section>
       </div>
     </main>
+  );
+}
+
+type CommentNode = ApiCommentResponse & { replies: CommentNode[] };
+
+function buildCommentTree(comments: ApiCommentResponse[]) {
+  const nodes = new Map<string, CommentNode>();
+  for (const comment of comments) nodes.set(comment.id, { ...comment, replies: [] });
+
+  const roots: CommentNode[] = [];
+  for (const node of nodes.values()) {
+    const parent = node.parent_id ? nodes.get(node.parent_id) : undefined;
+    if (parent) parent.replies.push(node);
+    else roots.push(node);
+  }
+  return roots;
+}
+
+function CommentItem({
+  comment,
+  onReply,
+  onLike,
+  liking,
+  depth = 0,
+}: {
+  comment: CommentNode;
+  onReply: (id: string, username: string) => void;
+  onLike: (id: string, viewerLiked: boolean) => void;
+  liking: boolean;
+  depth?: number;
+}) {
+  return (
+    <div
+      className={cn("border-border/60 border-b py-4 last:border-b-0", depth > 0 && "border-l pl-3")}
+      style={depth > 0 ? { marginLeft: `${Math.min(depth, 4) * 20}px` } : undefined}
+    >
+      <div className="flex gap-3">
+        <Avatar size="default" className="size-8 shrink-0">
+          <AvatarImage src={comment.author_avatar} />
+          <AvatarFallback>{comment.author_username.slice(0, 1)}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="text-muted-foreground text-xs font-medium">{comment.author_username}</p>
+          <p className="mt-1 text-sm leading-6">{comment.content}</p>
+          <div className="text-muted-foreground mt-1.5 flex items-center gap-3 text-[11px]">
+            <span>{formatRelativeTime(comment.created_at)}</span>
+            <button
+              type="button"
+              onClick={() => onReply(comment.id, comment.author_username)}
+              className="hover:text-foreground transition-colors"
+            >
+              回复
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => onLike(comment.id, comment.viewer_liked)}
+          className={`flex min-w-8 shrink-0 flex-col items-center gap-0.5 pt-0.5 ${comment.viewer_liked ? "text-primary" : "text-muted-foreground"}`}
+          aria-label="点赞评论"
+          disabled={liking}
+        >
+          <Heart className={`size-4 ${comment.viewer_liked ? "fill-primary" : ""}`} />
+          <span className="text-[10px] tabular-nums">{formatCount(comment.like_count)}</span>
+        </button>
+      </div>
+      {comment.replies.map((reply) => (
+        <CommentItem
+          key={reply.id}
+          comment={reply}
+          onReply={onReply}
+          onLike={onLike}
+          liking={liking}
+          depth={depth + 1}
+        />
+      ))}
+    </div>
   );
 }
