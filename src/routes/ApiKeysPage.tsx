@@ -79,7 +79,13 @@ export function ApiKeysPage() {
   return (
     <>
       <header className="border-border/60 bg-background/95 sticky top-0 z-30 flex h-12 items-center gap-2 border-b px-3 backdrop-blur-lg">
-        <Button variant="ghost" size="icon-sm" aria-label="返回个人主页" render={<Link to="/me" />}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="返回个人主页"
+          nativeButton={false}
+          render={<Link to="/me" />}
+        >
           <ArrowLeft />
         </Button>
         <h1 className="text-base font-semibold">API Key</h1>

@@ -59,7 +59,12 @@ export function TopBarAction({
   label: string;
 }) {
   return (
-    <Button variant="ghost" size="icon-sm" render={<Link to={to} aria-label={label} />}>
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      nativeButton={false}
+      render={<Link to={to} aria-label={label} />}
+    >
       {icon}
     </Button>
   );

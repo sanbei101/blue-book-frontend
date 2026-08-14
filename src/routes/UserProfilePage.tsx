@@ -251,7 +251,12 @@ export function UserProfilePage({ userId }: { userId: string }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
         <p className="text-muted-foreground text-sm">用户不存在或加载失败</p>
-        <Button render={<Link to="/" />} variant="outline" className="rounded-full">
+        <Button
+          variant="outline"
+          className="rounded-full"
+          nativeButton={false}
+          render={<Link to="/" />}
+        >
           返回首页
         </Button>
       </div>

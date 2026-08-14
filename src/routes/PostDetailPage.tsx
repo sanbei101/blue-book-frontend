@@ -190,7 +190,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
         <p className="text-muted-foreground text-sm">笔记无法加载,请稍后重试</p>
-        <Button render={<Link to="/" />} variant="outline">
+        <Button variant="outline" nativeButton={false} render={<Link to="/" />}>
           返回首页
         </Button>
       </div>

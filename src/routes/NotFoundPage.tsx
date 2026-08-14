@@ -11,7 +11,7 @@ export function NotFoundPage() {
         <h2 className="text-lg font-semibold">页面走丢了</h2>
         <p className="text-muted-foreground mt-1 text-sm">要不回到首页继续看看?</p>
       </div>
-      <Button render={<Link to="/" />} className="rounded-full">
+      <Button className="rounded-full" nativeButton={false} render={<Link to="/" />}>
         回到首页
       </Button>
     </div>
