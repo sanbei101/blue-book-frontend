@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Bookmark,
+  Copy,
   Heart,
   MessageCircle,
   MoreHorizontal,
@@ -31,6 +32,12 @@ import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { InputGroup, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -139,6 +146,21 @@ export function PostDetailPage({ postId }: { postId: string }) {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = { title: post?.title, url: window.location.href };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("链接已复制");
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast.error("分享失败,请稍后重试");
+    }
+  };
+
   if (postQuery.isPending) {
     return (
       <div className="mx-auto grid max-w-6xl gap-5 p-4 md:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)] md:p-5">
@@ -200,14 +222,20 @@ export function PostDetailPage({ postId }: { postId: string }) {
           >
             <ArrowLeft className="size-4" />
           </Link>
-          <button
-            type="button"
-            aria-label="更多操作"
-            title="更多操作"
-            className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur transition-colors hover:bg-black/60"
-          >
-            <MoreHorizontal className="size-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label="更多操作"
+              className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur transition-colors hover:bg-black/60"
+            >
+              <MoreHorizontal className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="min-w-28">
+              <DropdownMenuItem onClick={() => void handleShare()}>
+                <Copy />
+                分享笔记
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {media.length > 1 && (
             <>
@@ -319,6 +347,7 @@ export function PostDetailPage({ postId }: { postId: string }) {
                 type="button"
                 aria-label="分享笔记"
                 title="分享笔记"
+                onClick={() => void handleShare()}
                 className="text-muted-foreground hover:bg-muted flex size-8 items-center justify-center rounded-md transition-colors"
               >
                 <Share2 className="size-4" />
