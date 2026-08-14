@@ -1,5 +1,25 @@
 components:
   schemas:
+    api.apiKeyResponse:
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        key_prefix:
+          type: string
+        last_used_at:
+          type: string
+        name:
+          type: string
+        revoked_at:
+          type: string
+      required:
+        - created_at
+        - id
+        - key_prefix
+        - name
+      type: object
     api.authResponse:
       properties:
         access_token:
@@ -118,6 +138,34 @@ components:
         - user_id
         - viewer_liked
       type: object
+    api.createAPIKeyRequest:
+      properties:
+        name:
+          description: Key name shown in account settings.
+          maxLength: 100
+          type: string
+      required:
+        - name
+      type: object
+    api.createAPIKeyResponse:
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        key:
+          type: string
+        key_prefix:
+          type: string
+        name:
+          type: string
+      required:
+        - created_at
+        - id
+        - key
+        - key_prefix
+        - name
+      type: object
     api.createCommentRequest:
       properties:
         content:
@@ -206,6 +254,21 @@ components:
           type: string
       required:
         - name
+      type: object
+    api.cursorPageResponse-api_listPostsItemResponse:
+      properties:
+        has_more:
+          type: boolean
+        items:
+          items:
+            $ref: "#/components/schemas/api.listPostsItemResponse"
+          type: array
+          uniqueItems: false
+        next_cursor:
+          type: string
+      required:
+        - has_more
+        - items
       type: object
     api.deleteCommentResponse:
       properties:
@@ -460,6 +523,41 @@ components:
         - sort_order
         - width
       type: object
+    api.notificationActorResponse:
+      properties:
+        avatar_url:
+          type: string
+        id:
+          type: string
+        username:
+          type: string
+      required:
+        - avatar_url
+        - id
+        - username
+      type: object
+    api.notificationResponse:
+      properties:
+        actor:
+          $ref: "#/components/schemas/api.notificationActorResponse"
+        comment_id:
+          type: string
+        created_at:
+          type: string
+        id:
+          type: string
+        notification_type:
+          type: string
+        post_id:
+          type: string
+        read_at:
+          type: string
+      required:
+        - actor
+        - created_at
+        - id
+        - notification_type
+      type: object
     api.pageResponse-api_commentResponse:
       properties:
         items:
@@ -531,6 +629,28 @@ components:
         items:
           items:
             $ref: "#/components/schemas/api.listPostsItemResponse"
+          type: array
+          uniqueItems: false
+        page:
+          minimum: 1
+          type: integer
+        page_size:
+          minimum: 1
+          type: integer
+        total:
+          minimum: 0
+          type: integer
+      required:
+        - items
+        - page
+        - page_size
+        - total
+      type: object
+    api.pageResponse-api_notificationResponse:
+      properties:
+        items:
+          items:
+            $ref: "#/components/schemas/api.notificationResponse"
           type: array
           uniqueItems: false
         page:
@@ -772,6 +892,14 @@ components:
         - keyword
         - search_count
       type: object
+    api.unreadNotificationCountResponse:
+      properties:
+        count:
+          minimum: 0
+          type: integer
+      required:
+        - count
+      type: object
     api.updateFolderRequest:
       properties:
         name:
@@ -906,12 +1034,30 @@ components:
         msg:
           type: string
       type: object
+    render.Response-api_createAPIKeyResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: "#/components/schemas/api.createAPIKeyResponse"
+        msg:
+          type: string
+      type: object
     render.Response-api_createPostResponse:
       properties:
         code:
           type: integer
         data:
           $ref: "#/components/schemas/api.createPostResponse"
+        msg:
+          type: string
+      type: object
+    render.Response-api_cursorPageResponse-api_listPostsItemResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: "#/components/schemas/api.cursorPageResponse-api_listPostsItemResponse"
         msg:
           type: string
       type: object
@@ -996,6 +1142,15 @@ components:
         msg:
           type: string
       type: object
+    render.Response-api_pageResponse-api_notificationResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: "#/components/schemas/api.pageResponse-api_notificationResponse"
+        msg:
+          type: string
+      type: object
     render.Response-api_pageResponse-api_searchHistoryResponse:
       properties:
         code:
@@ -1059,6 +1214,15 @@ components:
         msg:
           type: string
       type: object
+    render.Response-api_unreadNotificationCountResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: "#/components/schemas/api.unreadNotificationCountResponse"
+        msg:
+          type: string
+      type: object
     render.Response-api_userProfileResponse:
       properties:
         code:
@@ -1074,6 +1238,18 @@ components:
           type: integer
         data:
           $ref: "#/components/schemas/api.userResponse"
+        msg:
+          type: string
+      type: object
+    render.Response-array_api_apiKeyResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          items:
+            $ref: "#/components/schemas/api.apiKeyResponse"
+          type: array
+          uniqueItems: false
         msg:
           type: string
       type: object
@@ -1104,6 +1280,99 @@ info:
   version: "1.0"
 openapi: 3.1.0
 paths:
+  /auth/api-keys:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-array_api_apiKeyResponse"
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取 API Key 列表
+      tags:
+        - auth
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/api.createAPIKeyRequest"
+              description: API Key 信息
+              summary: body
+        description: API Key 信息
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_createAPIKeyResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 创建 API Key
+      tags:
+        - auth
+  /auth/api-keys/{key_id}:
+    delete:
+      parameters:
+        - description: API Key ID
+          in: path
+          name: key_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.ResponseWithoutData"
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 撤销 API Key
+      tags:
+        - auth
   /auth/login:
     post:
       requestBody:
@@ -1441,6 +1710,38 @@ paths:
       summary: 点赞评论
       tags:
         - likes
+  /feed/following:
+    get:
+      parameters:
+        - description: 下一页游标
+          in: query
+          name: cursor
+          schema:
+            type: string
+        - description: 每页数量
+          in: query
+          name: limit
+          schema:
+            default: 20
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_cursorPageResponse-api_listPostsItemResponse"
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取关注用户的帖子列表
+      tags:
+        - posts
   /feed/recommended:
     get:
       parameters:
@@ -1664,6 +1965,90 @@ paths:
       summary: 修改收藏夹
       tags:
         - collections
+  /me/collections/folders/{folder_id}/posts:
+    get:
+      parameters:
+        - description: 收藏夹 ID
+          in: path
+          name: folder_id
+          required: true
+          schema:
+            type: string
+        - description: 页码
+          in: query
+          name: page
+          schema:
+            default: 1
+            type: integer
+        - description: 每页数量
+          in: query
+          name: page_size
+          schema:
+            default: 20
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取收藏夹中的帖子
+      tags:
+        - collections
+  /me/likes:
+    get:
+      parameters:
+        - description: 页码
+          in: query
+          name: page
+          schema:
+            default: 1
+            type: integer
+        - description: 每页数量
+          in: query
+          name: page_size
+          schema:
+            default: 20
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse"
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取我点赞的帖子
+      tags:
+        - likes
   /me/profile:
     get:
       responses:
@@ -1783,7 +2168,7 @@ paths:
       summary: 获取媒体上传地址
       tags:
         - media
-  /posts:
+  /notifications:
     get:
       parameters:
         - description: 页码
@@ -1803,7 +2188,118 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse"
+                $ref: "#/components/schemas/render.Response-api_pageResponse-api_notificationResponse"
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取通知列表
+      tags:
+        - notifications
+  /notifications/{notification_id}/read:
+    patch:
+      parameters:
+        - description: 通知 ID
+          in: path
+          name: notification_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.ResponseWithoutData"
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 标记通知为已读
+      tags:
+        - notifications
+  /notifications/read-all:
+    post:
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.ResponseWithoutData"
+          description: No Content
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 标记全部通知为已读
+      tags:
+        - notifications
+  /notifications/unread-count:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_unreadNotificationCountResponse"
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.errorResponse"
+          description: Internal Server Error
+      security:
+        - BearerAuth: []
+      summary: 获取未读通知数量
+      tags:
+        - notifications
+  /posts:
+    get:
+      parameters:
+        - description: 下一页游标
+          in: query
+          name: cursor
+          schema:
+            type: string
+        - description: 每页数量
+          in: query
+          name: limit
+          schema:
+            default: 20
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/render.Response-api_cursorPageResponse-api_listPostsItemResponse"
           description: OK
         "500":
           content:
@@ -2714,15 +3210,14 @@ paths:
           required: true
           schema:
             type: string
-        - description: 页码
+        - description: 下一页游标
           in: query
-          name: page
+          name: cursor
           schema:
-            default: 1
-            type: integer
+            type: string
         - description: 每页数量
           in: query
-          name: page_size
+          name: limit
           schema:
             default: 20
             type: integer
@@ -2731,7 +3226,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/render.Response-api_pageResponse-api_listPostsItemResponse"
+                $ref: "#/components/schemas/render.Response-api_cursorPageResponse-api_listPostsItemResponse"
           description: OK
         "400":
           content:

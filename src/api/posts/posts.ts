@@ -25,12 +25,13 @@ import { customInstance } from "../../mutator";
 import type {
   ApiCreatePostRequest,
   ApiUpdatePostRequest,
+  GetFeedFollowingParams,
   GetPostsParams,
   GetUsersUserIdPostsParams,
   RenderErrorResponse,
   RenderResponseApiCreatePostResponse,
+  RenderResponseApiCursorPageResponseApiListPostsItemResponse,
   RenderResponseApiGetPostsResponse,
-  RenderResponseApiPageResponseApiListPostsItemResponse,
   RenderResponseWithoutData,
 } from "../api.schemas";
 
@@ -52,6 +53,124 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
+ * @summary 获取关注用户的帖子列表
+ */
+export const getFeedFollowing = (
+  params?: GetFeedFollowingParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseApiCursorPageResponseApiListPostsItemResponse>(
+    { url: `/feed/following`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetFeedFollowingQueryKey = (params?: GetFeedFollowingParams) => {
+  return [`/feed/following`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetFeedFollowingQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFeedFollowing>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetFeedFollowingParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFeedFollowing>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetFeedFollowingQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFeedFollowing>>> = ({ signal }) =>
+    getFeedFollowing(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getFeedFollowing>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetFeedFollowingQueryResult = NonNullable<Awaited<ReturnType<typeof getFeedFollowing>>>;
+export type GetFeedFollowingQueryError = RenderErrorResponse;
+
+export function useGetFeedFollowing<
+  TData = Awaited<ReturnType<typeof getFeedFollowing>>,
+  TError = RenderErrorResponse,
+>(
+  params: undefined | GetFeedFollowingParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFeedFollowing>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFeedFollowing>>,
+          TError,
+          Awaited<ReturnType<typeof getFeedFollowing>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetFeedFollowing<
+  TData = Awaited<ReturnType<typeof getFeedFollowing>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetFeedFollowingParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFeedFollowing>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFeedFollowing>>,
+          TError,
+          Awaited<ReturnType<typeof getFeedFollowing>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetFeedFollowing<
+  TData = Awaited<ReturnType<typeof getFeedFollowing>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetFeedFollowingParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFeedFollowing>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary 获取关注用户的帖子列表
+ */
+
+export function useGetFeedFollowing<
+  TData = Awaited<ReturnType<typeof getFeedFollowing>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetFeedFollowingParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFeedFollowing>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetFeedFollowingQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+/**
  * @summary 获取帖子列表
  */
 export const getPosts = (
@@ -59,7 +178,7 @@ export const getPosts = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiCursorPageResponseApiListPostsItemResponse>(
     { url: `/posts`, method: "GET", params, signal },
     options,
   );
@@ -544,7 +663,7 @@ export const getUsersUserIdPosts = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
+  return customInstance<RenderResponseApiCursorPageResponseApiListPostsItemResponse>(
     { url: `/users/${userId}/posts`, method: "GET", params, signal },
     options,
   );

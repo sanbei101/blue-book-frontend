@@ -13,6 +13,7 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & { _retriedAfterRefres
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 const ME_KEY = "blue_book:me";
+const UNAUTHENTICATED_AUTH_ENDPOINTS = new Set(["/auth/login", "/auth/register", "/auth/refresh"]);
 
 export class ApiError extends Error {
   code: number;
@@ -34,9 +35,13 @@ export const AXIOS_INSTANCE = Axios.create({
   baseURL: "/api/v1",
 });
 
+function isUnauthenticatedAuthEndpoint(url?: string) {
+  return UNAUTHENTICATED_AUTH_ENDPOINTS.has(url ?? "");
+}
+
 AXIOS_INSTANCE.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-  if (token && config.headers && !config.url?.startsWith("/auth/")) {
+  if (token && config.headers && !isUnauthenticatedAuthEndpoint(config.url)) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -64,7 +69,7 @@ async function refreshAccessToken() {
 }
 
 async function retryAfterRefresh(config: RetriableRequestConfig) {
-  if (config._retriedAfterRefresh || config.url?.startsWith("/auth/")) {
+  if (config._retriedAfterRefresh || isUnauthenticatedAuthEndpoint(config.url)) {
     throw new ApiError("登录已过期，请重新登录", 401);
   }
 

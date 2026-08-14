@@ -2,6 +2,7 @@ import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/re
 
 import { AppShell } from "@/components/layout/AppShell";
 
+import { ApiKeysPage } from "./routes/ApiKeysPage";
 import { ExplorePage } from "./routes/ExplorePage";
 import { HomePage } from "./routes/HomePage";
 import { NotFoundPage } from "./routes/NotFoundPage";
@@ -55,6 +56,12 @@ const meRoute = createRoute({
   component: ProfilePage,
 });
 
+const apiKeysRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: "/settings/api-keys",
+  component: ApiKeysPage,
+});
+
 // Standalone (no bottom nav)
 const userProfileRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -75,7 +82,14 @@ const postDetailRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  shellRoute.addChildren([indexRoute, exploreRoute, publishRoute, notificationsRoute, meRoute]),
+  shellRoute.addChildren([
+    indexRoute,
+    exploreRoute,
+    publishRoute,
+    notificationsRoute,
+    meRoute,
+    apiKeysRoute,
+  ]),
   userProfileRoute,
   postDetailRoute,
 ]);

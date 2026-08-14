@@ -5,6 +5,15 @@
  * 小蓝书后端接口文档
  * OpenAPI spec version: 1.0
  */
+export interface ApiApiKeyResponse {
+  created_at: string;
+  id: string;
+  key_prefix: string;
+  last_used_at?: string;
+  name: string;
+  revoked_at?: string;
+}
+
 /**
  * 用户信息
  */
@@ -98,6 +107,22 @@ export interface ApiCommentResponse {
   viewer_liked: boolean;
 }
 
+export interface ApiCreateAPIKeyRequest {
+  /**
+   * Key name shown in account settings.
+   * @maxLength 100
+   */
+  name: string;
+}
+
+export interface ApiCreateAPIKeyResponse {
+  created_at: string;
+  id: string;
+  key: string;
+  key_prefix: string;
+  name: string;
+}
+
 export interface ApiCreateCommentRequest {
   /**
    * 评论内容
@@ -168,6 +193,60 @@ export interface ApiCreateTagRequest {
    * @maxLength 50
    */
   name: string;
+}
+
+export interface ApiListPostsItemResponse {
+  author: ApiAuthorResponse;
+  /**
+   * 收藏数
+   * @minimum 0
+   */
+  collect_count: number;
+  /**
+   * 评论数
+   * @minimum 0
+   */
+  comment_count: number;
+  /** 内容 */
+  content: string;
+  /** 封面 URL */
+  cover_url: string;
+  /** 创建时间 */
+  created_at: string;
+  /**
+   * 封面高度
+   * @minimum 0
+   */
+  height: number;
+  /** 帖子 ID */
+  id: string;
+  /**
+   * 点赞数
+   * @minimum 0
+   */
+  like_count: number;
+  /** 标题 */
+  title: string;
+  /**
+   * 浏览量
+   * @minimum 0
+   */
+  view_count: number;
+  /** 当前用户是否已收藏 */
+  viewer_collected: boolean;
+  /** 当前用户是否已点赞 */
+  viewer_liked: boolean;
+  /**
+   * 封面宽度
+   * @minimum 0
+   */
+  width: number;
+}
+
+export interface ApiCursorPageResponseApiListPostsItemResponse {
+  has_more: boolean;
+  items: ApiListPostsItemResponse[];
+  next_cursor?: string;
 }
 
 export interface ApiDeleteCommentResponse {
@@ -299,59 +378,27 @@ export interface ApiLikeStatusResponse {
   viewer_liked: boolean;
 }
 
-export interface ApiListPostsItemResponse {
-  author: ApiAuthorResponse;
-  /**
-   * 收藏数
-   * @minimum 0
-   */
-  collect_count: number;
-  /**
-   * 评论数
-   * @minimum 0
-   */
-  comment_count: number;
-  /** 内容 */
-  content: string;
-  /** 封面 URL */
-  cover_url: string;
-  /** 创建时间 */
-  created_at: string;
-  /**
-   * 封面高度
-   * @minimum 0
-   */
-  height: number;
-  /** 帖子 ID */
-  id: string;
-  /**
-   * 点赞数
-   * @minimum 0
-   */
-  like_count: number;
-  /** 标题 */
-  title: string;
-  /**
-   * 浏览量
-   * @minimum 0
-   */
-  view_count: number;
-  /** 当前用户是否已收藏 */
-  viewer_collected: boolean;
-  /** 当前用户是否已点赞 */
-  viewer_liked: boolean;
-  /**
-   * 封面宽度
-   * @minimum 0
-   */
-  width: number;
-}
-
 export interface ApiLoginRequest {
   /** 密码 */
   password: string;
   /** 用户名 */
   username: string;
+}
+
+export interface ApiNotificationActorResponse {
+  avatar_url: string;
+  id: string;
+  username: string;
+}
+
+export interface ApiNotificationResponse {
+  actor: ApiNotificationActorResponse;
+  comment_id?: string;
+  created_at: string;
+  id: string;
+  notification_type: string;
+  post_id?: string;
+  read_at?: string;
 }
 
 export interface ApiPageResponseApiCommentResponse {
@@ -386,6 +433,16 @@ export interface ApiPageResponseApiFollowUserResponse {
 
 export interface ApiPageResponseApiListPostsItemResponse {
   items: ApiListPostsItemResponse[];
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  /** @minimum 0 */
+  total: number;
+}
+
+export interface ApiPageResponseApiNotificationResponse {
+  items: ApiNotificationResponse[];
   /** @minimum 1 */
   page: number;
   /** @minimum 1 */
@@ -505,6 +562,11 @@ export interface ApiSearchResponse {
   users: ApiPageResponseApiFollowUserResponse;
 }
 
+export interface ApiUnreadNotificationCountResponse {
+  /** @minimum 0 */
+  count: number;
+}
+
 export interface ApiUpdateFolderRequest {
   /**
    * 收藏夹名称
@@ -577,9 +639,21 @@ export interface RenderResponseApiCommentResponse {
   msg?: string;
 }
 
+export interface RenderResponseApiCreateAPIKeyResponse {
+  code?: number;
+  data?: ApiCreateAPIKeyResponse;
+  msg?: string;
+}
+
 export interface RenderResponseApiCreatePostResponse {
   code?: number;
   data?: ApiCreatePostResponse;
+  msg?: string;
+}
+
+export interface RenderResponseApiCursorPageResponseApiListPostsItemResponse {
+  code?: number;
+  data?: ApiCursorPageResponseApiListPostsItemResponse;
   msg?: string;
 }
 
@@ -637,6 +711,12 @@ export interface RenderResponseApiPageResponseApiListPostsItemResponse {
   msg?: string;
 }
 
+export interface RenderResponseApiPageResponseApiNotificationResponse {
+  code?: number;
+  data?: ApiPageResponseApiNotificationResponse;
+  msg?: string;
+}
+
 export interface RenderResponseApiPageResponseApiSearchHistoryResponse {
   code?: number;
   data?: ApiPageResponseApiSearchHistoryResponse;
@@ -679,6 +759,12 @@ export interface RenderResponseApiTopicResponse {
   msg?: string;
 }
 
+export interface RenderResponseApiUnreadNotificationCountResponse {
+  code?: number;
+  data?: ApiUnreadNotificationCountResponse;
+  msg?: string;
+}
+
 export interface RenderResponseApiUserProfileResponse {
   code?: number;
   data?: ApiUserProfileResponse;
@@ -691,6 +777,12 @@ export interface RenderResponseApiUserResponse {
   msg?: string;
 }
 
+export interface RenderResponseArrayApiApiKeyResponse {
+  code?: number;
+  data?: ApiApiKeyResponse[];
+  msg?: string;
+}
+
 export interface RenderResponseWithoutData {
   code?: number;
   msg?: string;
@@ -700,6 +792,17 @@ export interface RenderErrorResponse {
   code?: number;
   msg?: string;
 }
+
+export type GetFeedFollowingParams = {
+  /**
+   * 下一页游标
+   */
+  cursor?: string;
+  /**
+   * 每页数量
+   */
+  limit?: number;
+};
 
 export type GetFeedRecommendedParams = {
   /**
@@ -734,7 +837,40 @@ export type GetMeCollectionsFoldersParams = {
   page_size?: number;
 };
 
+export type GetMeCollectionsFoldersFolderIdPostsParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetMeLikesParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
 export type GetMeSearchHistoryParams = {
+  /**
+   * 页码
+   */
+  page?: number;
+  /**
+   * 每页数量
+   */
+  page_size?: number;
+};
+
+export type GetNotificationsParams = {
   /**
    * 页码
    */
@@ -747,13 +883,13 @@ export type GetMeSearchHistoryParams = {
 
 export type GetPostsParams = {
   /**
-   * 页码
+   * 下一页游标
    */
-  page?: number;
+  cursor?: string;
   /**
    * 每页数量
    */
-  page_size?: number;
+  limit?: number;
 };
 
 export type GetPostsPostIdCommentsParams = {
@@ -861,11 +997,11 @@ export type GetUsersUserIdFollowingParams = {
 
 export type GetUsersUserIdPostsParams = {
   /**
-   * 页码
+   * 下一页游标
    */
-  page?: number;
+  cursor?: string;
   /**
    * 每页数量
    */
-  page_size?: number;
+  limit?: number;
 };

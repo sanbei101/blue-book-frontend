@@ -24,12 +24,15 @@ import type {
 import { customInstance } from "../../mutator";
 import type {
   ApiChangePasswordRequest,
+  ApiCreateAPIKeyRequest,
   ApiLoginRequest,
   ApiRefreshTokenRequest,
   ApiRegisterRequest,
   RenderErrorResponse,
   RenderResponseApiAuthResponse,
+  RenderResponseApiCreateAPIKeyResponse,
   RenderResponseApiUserResponse,
+  RenderResponseArrayApiApiKeyResponse,
   RenderResponseWithoutData,
 } from "../api.schemas";
 
@@ -50,6 +53,278 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+/**
+ * @summary 获取 API Key 列表
+ */
+export const getAuthApiKeys = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseArrayApiApiKeyResponse>(
+    { url: `/auth/api-keys`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetAuthApiKeysQueryKey = () => {
+  return [`/auth/api-keys`] as const;
+};
+
+export const getGetAuthApiKeysQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAuthApiKeys>>,
+  TError = RenderErrorResponse,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAuthApiKeys>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAuthApiKeysQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuthApiKeys>>> = ({ signal }) =>
+    getAuthApiKeys(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAuthApiKeys>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAuthApiKeysQueryResult = NonNullable<Awaited<ReturnType<typeof getAuthApiKeys>>>;
+export type GetAuthApiKeysQueryError = RenderErrorResponse;
+
+export function useGetAuthApiKeys<
+  TData = Awaited<ReturnType<typeof getAuthApiKeys>>,
+  TError = RenderErrorResponse,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAuthApiKeys>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAuthApiKeys>>,
+          TError,
+          Awaited<ReturnType<typeof getAuthApiKeys>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAuthApiKeys<
+  TData = Awaited<ReturnType<typeof getAuthApiKeys>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAuthApiKeys>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAuthApiKeys>>,
+          TError,
+          Awaited<ReturnType<typeof getAuthApiKeys>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAuthApiKeys<
+  TData = Awaited<ReturnType<typeof getAuthApiKeys>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAuthApiKeys>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary 获取 API Key 列表
+ */
+
+export function useGetAuthApiKeys<
+  TData = Awaited<ReturnType<typeof getAuthApiKeys>>,
+  TError = RenderErrorResponse,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAuthApiKeys>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAuthApiKeysQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+/**
+ * @summary 创建 API Key
+ */
+export const postAuthApiKeys = (
+  apiCreateAPIKeyRequest: ApiCreateAPIKeyRequest,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseApiCreateAPIKeyResponse>(
+    {
+      url: `/auth/api-keys`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: apiCreateAPIKeyRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostAuthApiKeysMutationOptions = <
+  TError = RenderErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postAuthApiKeys>>,
+    TError,
+    { data: ApiCreateAPIKeyRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postAuthApiKeys>>,
+  TError,
+  { data: ApiCreateAPIKeyRequest },
+  TContext
+> => {
+  const mutationKey = ["postAuthApiKeys"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postAuthApiKeys>>,
+    { data: ApiCreateAPIKeyRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postAuthApiKeys(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostAuthApiKeysMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAuthApiKeys>>
+>;
+export type PostAuthApiKeysMutationBody = ApiCreateAPIKeyRequest;
+export type PostAuthApiKeysMutationError = RenderErrorResponse;
+
+/**
+ * @summary 创建 API Key
+ */
+export const usePostAuthApiKeys = <TError = RenderErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postAuthApiKeys>>,
+      TError,
+      { data: ApiCreateAPIKeyRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postAuthApiKeys>>,
+  TError,
+  { data: ApiCreateAPIKeyRequest },
+  TContext
+> => {
+  return useMutation(getPostAuthApiKeysMutationOptions(options), queryClient);
+};
+/**
+ * @summary 撤销 API Key
+ */
+export const deleteAuthApiKeysKeyId = (
+  keyId: string,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseWithoutData>(
+    { url: `/auth/api-keys/${keyId}`, method: "DELETE", signal },
+    options,
+  );
+};
+
+export const getDeleteAuthApiKeysKeyIdMutationOptions = <
+  TError = RenderErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
+    TError,
+    { keyId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
+  TError,
+  { keyId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteAuthApiKeysKeyId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
+    { keyId: string }
+  > = (props) => {
+    const { keyId } = props ?? {};
+
+    return deleteAuthApiKeysKeyId(keyId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteAuthApiKeysKeyIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>
+>;
+
+export type DeleteAuthApiKeysKeyIdMutationError = RenderErrorResponse;
+
+/**
+ * @summary 撤销 API Key
+ */
+export const useDeleteAuthApiKeysKeyId = <TError = RenderErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
+      TError,
+      { keyId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
+  TError,
+  { keyId: string },
+  TContext
+> => {
+  return useMutation(getDeleteAuthApiKeysKeyIdMutationOptions(options), queryClient);
+};
 /**
  * @summary 用户登录
  */

@@ -212,7 +212,7 @@ export function UserProfilePage({ userId }: { userId: string }) {
   const user = userQuery.data;
   const postsQuery = useGetUsersUserIdPosts(
     userId,
-    { page: 1, page_size: 20 },
+    { limit: 20 },
     { query: { enabled: Boolean(user) } },
   );
   const followMutation = usePutUsersUserIdFollow();

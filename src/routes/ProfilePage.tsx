@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Settings, Share2, Edit3, Grid3x3, Bookmark, Heart, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ export function ProfilePage() {
   const user = profileQuery.data;
   const postsQuery = useGetUsersUserIdPosts(
     user?.id ?? "",
-    { page: 1, page_size: 20 },
+    { limit: 20 },
     { query: { enabled: Boolean(user?.id) } },
   );
   const collectionsQuery = useGetMeCollections(
@@ -52,7 +53,12 @@ export function ProfilePage() {
             <Button variant="ghost" size="icon-sm" aria-label="分享">
               <Share2 className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon-sm" aria-label="设置">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="API Key 设置"
+              render={<Link to="/settings/api-keys" />}
+            >
               <Settings className="size-4" />
             </Button>
           </div>

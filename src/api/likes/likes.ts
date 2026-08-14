@@ -5,18 +5,46 @@
  * 小蓝书后端接口文档
  * OpenAPI spec version: 1.0
  */
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from "@tanstack/react-query";
 
 import { customInstance } from "../../mutator";
-import type { RenderErrorResponse, RenderResponseApiLikeStatusResponse } from "../api.schemas";
+import type {
+  GetMeLikesParams,
+  RenderErrorResponse,
+  RenderResponseApiLikeStatusResponse,
+  RenderResponseApiPageResponseApiListPostsItemResponse,
+} from "../api.schemas";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === "queryKey") continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
 
 /**
  * @summary 取消点赞评论
@@ -174,6 +202,124 @@ export const usePutCommentsCommentIdLike = <TError = RenderErrorResponse, TConte
 > => {
   return useMutation(getPutCommentsCommentIdLikeMutationOptions(options), queryClient);
 };
+/**
+ * @summary 获取我点赞的帖子
+ */
+export const getMeLikes = (
+  params?: GetMeLikesParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<RenderResponseApiPageResponseApiListPostsItemResponse>(
+    { url: `/me/likes`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetMeLikesQueryKey = (params?: GetMeLikesParams) => {
+  return [`/me/likes`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetMeLikesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMeLikes>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetMeLikesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeLikes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMeLikesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeLikes>>> = ({ signal }) =>
+    getMeLikes(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMeLikes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMeLikesQueryResult = NonNullable<Awaited<ReturnType<typeof getMeLikes>>>;
+export type GetMeLikesQueryError = RenderErrorResponse;
+
+export function useGetMeLikes<
+  TData = Awaited<ReturnType<typeof getMeLikes>>,
+  TError = RenderErrorResponse,
+>(
+  params: undefined | GetMeLikesParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeLikes>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeLikes>>,
+          TError,
+          Awaited<ReturnType<typeof getMeLikes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMeLikes<
+  TData = Awaited<ReturnType<typeof getMeLikes>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetMeLikesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeLikes>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeLikes>>,
+          TError,
+          Awaited<ReturnType<typeof getMeLikes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMeLikes<
+  TData = Awaited<ReturnType<typeof getMeLikes>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetMeLikesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeLikes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary 获取我点赞的帖子
+ */
+
+export function useGetMeLikes<
+  TData = Awaited<ReturnType<typeof getMeLikes>>,
+  TError = RenderErrorResponse,
+>(
+  params?: GetMeLikesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeLikes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetMeLikesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 /**
  * @summary 取消点赞帖子
  */
