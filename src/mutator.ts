@@ -32,7 +32,7 @@ export class ApiError extends Error {
 type ApiPayload<T> = T extends { data?: infer TData } ? TData : void;
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL: "/api/v1",
+  baseURL: "https://blue-book-api.sanbei101.cn/api/v1",
 });
 
 function isUnauthenticatedAuthEndpoint(url?: string) {
