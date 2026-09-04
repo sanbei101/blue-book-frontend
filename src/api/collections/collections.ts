@@ -323,6 +323,8 @@ export const postMeCollectionsFolders = (
   );
 };
 
+export const getPostMeCollectionsFoldersMutationKey = () => ["postMeCollectionsFolders"] as const;
+
 export const getPostMeCollectionsFoldersMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -330,17 +332,17 @@ export const getPostMeCollectionsFoldersMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postMeCollectionsFolders>>,
     TError,
-    { data: ApiCreateFolderRequest },
+    PostMeCollectionsFoldersMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postMeCollectionsFolders>>,
   TError,
-  { data: ApiCreateFolderRequest },
+  PostMeCollectionsFoldersMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postMeCollectionsFolders"];
+  const mutationKey = getPostMeCollectionsFoldersMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -349,7 +351,7 @@ export const getPostMeCollectionsFoldersMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postMeCollectionsFolders>>,
-    { data: ApiCreateFolderRequest }
+    PostMeCollectionsFoldersMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -364,6 +366,7 @@ export type PostMeCollectionsFoldersMutationResult = NonNullable<
 >;
 export type PostMeCollectionsFoldersMutationBody = ApiCreateFolderRequest;
 export type PostMeCollectionsFoldersMutationError = RenderErrorResponse;
+export type PostMeCollectionsFoldersMutationVariables = { data: ApiCreateFolderRequest };
 
 /**
  * @summary 创建收藏夹
@@ -373,7 +376,7 @@ export const usePostMeCollectionsFolders = <TError = RenderErrorResponse, TConte
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postMeCollectionsFolders>>,
       TError,
-      { data: ApiCreateFolderRequest },
+      PostMeCollectionsFoldersMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -382,7 +385,7 @@ export const usePostMeCollectionsFolders = <TError = RenderErrorResponse, TConte
 ): UseMutationResult<
   Awaited<ReturnType<typeof postMeCollectionsFolders>>,
   TError,
-  { data: ApiCreateFolderRequest },
+  PostMeCollectionsFoldersMutationVariables,
   TContext
 > => {
   return useMutation(getPostMeCollectionsFoldersMutationOptions(options), queryClient);
@@ -401,6 +404,9 @@ export const deleteMeCollectionsFoldersFolderId = (
   );
 };
 
+export const getDeleteMeCollectionsFoldersFolderIdMutationKey = () =>
+  ["deleteMeCollectionsFoldersFolderId"] as const;
+
 export const getDeleteMeCollectionsFoldersFolderIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -408,17 +414,17 @@ export const getDeleteMeCollectionsFoldersFolderIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteMeCollectionsFoldersFolderId>>,
     TError,
-    { folderId: string },
+    DeleteMeCollectionsFoldersFolderIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteMeCollectionsFoldersFolderId>>,
   TError,
-  { folderId: string },
+  DeleteMeCollectionsFoldersFolderIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deleteMeCollectionsFoldersFolderId"];
+  const mutationKey = getDeleteMeCollectionsFoldersFolderIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -427,7 +433,7 @@ export const getDeleteMeCollectionsFoldersFolderIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteMeCollectionsFoldersFolderId>>,
-    { folderId: string }
+    DeleteMeCollectionsFoldersFolderIdMutationVariables
   > = (props) => {
     const { folderId } = props ?? {};
 
@@ -442,6 +448,7 @@ export type DeleteMeCollectionsFoldersFolderIdMutationResult = NonNullable<
 >;
 
 export type DeleteMeCollectionsFoldersFolderIdMutationError = RenderErrorResponse;
+export type DeleteMeCollectionsFoldersFolderIdMutationVariables = { folderId: string };
 
 /**
  * @summary 删除收藏夹
@@ -454,7 +461,7 @@ export const useDeleteMeCollectionsFoldersFolderId = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteMeCollectionsFoldersFolderId>>,
       TError,
-      { folderId: string },
+      DeleteMeCollectionsFoldersFolderIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -463,7 +470,7 @@ export const useDeleteMeCollectionsFoldersFolderId = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteMeCollectionsFoldersFolderId>>,
   TError,
-  { folderId: string },
+  DeleteMeCollectionsFoldersFolderIdMutationVariables,
   TContext
 > => {
   return useMutation(getDeleteMeCollectionsFoldersFolderIdMutationOptions(options), queryClient);
@@ -489,6 +496,9 @@ export const patchMeCollectionsFoldersFolderId = (
   );
 };
 
+export const getPatchMeCollectionsFoldersFolderIdMutationKey = () =>
+  ["patchMeCollectionsFoldersFolderId"] as const;
+
 export const getPatchMeCollectionsFoldersFolderIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -496,17 +506,17 @@ export const getPatchMeCollectionsFoldersFolderIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof patchMeCollectionsFoldersFolderId>>,
     TError,
-    { folderId: string; data: ApiUpdateFolderRequest },
+    PatchMeCollectionsFoldersFolderIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof patchMeCollectionsFoldersFolderId>>,
   TError,
-  { folderId: string; data: ApiUpdateFolderRequest },
+  PatchMeCollectionsFoldersFolderIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["patchMeCollectionsFoldersFolderId"];
+  const mutationKey = getPatchMeCollectionsFoldersFolderIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -515,7 +525,7 @@ export const getPatchMeCollectionsFoldersFolderIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof patchMeCollectionsFoldersFolderId>>,
-    { folderId: string; data: ApiUpdateFolderRequest }
+    PatchMeCollectionsFoldersFolderIdMutationVariables
   > = (props) => {
     const { folderId, data } = props ?? {};
 
@@ -530,6 +540,10 @@ export type PatchMeCollectionsFoldersFolderIdMutationResult = NonNullable<
 >;
 export type PatchMeCollectionsFoldersFolderIdMutationBody = ApiUpdateFolderRequest;
 export type PatchMeCollectionsFoldersFolderIdMutationError = RenderErrorResponse;
+export type PatchMeCollectionsFoldersFolderIdMutationVariables = {
+  folderId: string;
+  data: ApiUpdateFolderRequest;
+};
 
 /**
  * @summary 修改收藏夹
@@ -542,7 +556,7 @@ export const usePatchMeCollectionsFoldersFolderId = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof patchMeCollectionsFoldersFolderId>>,
       TError,
-      { folderId: string; data: ApiUpdateFolderRequest },
+      PatchMeCollectionsFoldersFolderIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -551,7 +565,7 @@ export const usePatchMeCollectionsFoldersFolderId = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof patchMeCollectionsFoldersFolderId>>,
   TError,
-  { folderId: string; data: ApiUpdateFolderRequest },
+  PatchMeCollectionsFoldersFolderIdMutationVariables,
   TContext
 > => {
   return useMutation(getPatchMeCollectionsFoldersFolderIdMutationOptions(options), queryClient);
@@ -741,6 +755,9 @@ export const deletePostsPostIdCollection = (
   );
 };
 
+export const getDeletePostsPostIdCollectionMutationKey = () =>
+  ["deletePostsPostIdCollection"] as const;
+
 export const getDeletePostsPostIdCollectionMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -748,17 +765,17 @@ export const getDeletePostsPostIdCollectionMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deletePostsPostIdCollection>>,
     TError,
-    { postId: string },
+    DeletePostsPostIdCollectionMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deletePostsPostIdCollection>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdCollectionMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deletePostsPostIdCollection"];
+  const mutationKey = getDeletePostsPostIdCollectionMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -767,7 +784,7 @@ export const getDeletePostsPostIdCollectionMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deletePostsPostIdCollection>>,
-    { postId: string }
+    DeletePostsPostIdCollectionMutationVariables
   > = (props) => {
     const { postId } = props ?? {};
 
@@ -782,6 +799,7 @@ export type DeletePostsPostIdCollectionMutationResult = NonNullable<
 >;
 
 export type DeletePostsPostIdCollectionMutationError = RenderErrorResponse;
+export type DeletePostsPostIdCollectionMutationVariables = { postId: string };
 
 /**
  * @summary 取消收藏帖子
@@ -791,7 +809,7 @@ export const useDeletePostsPostIdCollection = <TError = RenderErrorResponse, TCo
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deletePostsPostIdCollection>>,
       TError,
-      { postId: string },
+      DeletePostsPostIdCollectionMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -800,7 +818,7 @@ export const useDeletePostsPostIdCollection = <TError = RenderErrorResponse, TCo
 ): UseMutationResult<
   Awaited<ReturnType<typeof deletePostsPostIdCollection>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdCollectionMutationVariables,
   TContext
 > => {
   return useMutation(getDeletePostsPostIdCollectionMutationOptions(options), queryClient);
@@ -826,6 +844,8 @@ export const putPostsPostIdCollection = (
   );
 };
 
+export const getPutPostsPostIdCollectionMutationKey = () => ["putPostsPostIdCollection"] as const;
+
 export const getPutPostsPostIdCollectionMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -833,17 +853,17 @@ export const getPutPostsPostIdCollectionMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putPostsPostIdCollection>>,
     TError,
-    { postId: string; data?: ApiCollectPostRequest },
+    PutPostsPostIdCollectionMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putPostsPostIdCollection>>,
   TError,
-  { postId: string; data?: ApiCollectPostRequest },
+  PutPostsPostIdCollectionMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putPostsPostIdCollection"];
+  const mutationKey = getPutPostsPostIdCollectionMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -852,7 +872,7 @@ export const getPutPostsPostIdCollectionMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putPostsPostIdCollection>>,
-    { postId: string; data?: ApiCollectPostRequest }
+    PutPostsPostIdCollectionMutationVariables
   > = (props) => {
     const { postId, data } = props ?? {};
 
@@ -867,6 +887,10 @@ export type PutPostsPostIdCollectionMutationResult = NonNullable<
 >;
 export type PutPostsPostIdCollectionMutationBody = ApiCollectPostRequest | undefined;
 export type PutPostsPostIdCollectionMutationError = RenderErrorResponse;
+export type PutPostsPostIdCollectionMutationVariables = {
+  postId: string;
+  data?: ApiCollectPostRequest;
+};
 
 /**
  * @summary 收藏帖子
@@ -876,7 +900,7 @@ export const usePutPostsPostIdCollection = <TError = RenderErrorResponse, TConte
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putPostsPostIdCollection>>,
       TError,
-      { postId: string; data?: ApiCollectPostRequest },
+      PutPostsPostIdCollectionMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -885,7 +909,7 @@ export const usePutPostsPostIdCollection = <TError = RenderErrorResponse, TConte
 ): UseMutationResult<
   Awaited<ReturnType<typeof putPostsPostIdCollection>>,
   TError,
-  { postId: string; data?: ApiCollectPostRequest },
+  PutPostsPostIdCollectionMutationVariables,
   TContext
 > => {
   return useMutation(getPutPostsPostIdCollectionMutationOptions(options), queryClient);

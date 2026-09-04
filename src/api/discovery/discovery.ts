@@ -195,6 +195,8 @@ export const deleteMeSearchHistory = (
   );
 };
 
+export const getDeleteMeSearchHistoryMutationKey = () => ["deleteMeSearchHistory"] as const;
+
 export const getDeleteMeSearchHistoryMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -212,7 +214,7 @@ export const getDeleteMeSearchHistoryMutationOptions = <
   void,
   TContext
 > => {
-  const mutationKey = ["deleteMeSearchHistory"];
+  const mutationKey = getDeleteMeSearchHistoryMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -762,6 +764,8 @@ export const postTags = (
   );
 };
 
+export const getPostTagsMutationKey = () => ["postTags"] as const;
+
 export const getPostTagsMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -769,17 +773,17 @@ export const getPostTagsMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postTags>>,
     TError,
-    { data: ApiCreateTagRequest },
+    PostTagsMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postTags>>,
   TError,
-  { data: ApiCreateTagRequest },
+  PostTagsMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postTags"];
+  const mutationKey = getPostTagsMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -788,7 +792,7 @@ export const getPostTagsMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postTags>>,
-    { data: ApiCreateTagRequest }
+    PostTagsMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -801,6 +805,7 @@ export const getPostTagsMutationOptions = <
 export type PostTagsMutationResult = NonNullable<Awaited<ReturnType<typeof postTags>>>;
 export type PostTagsMutationBody = ApiCreateTagRequest;
 export type PostTagsMutationError = RenderErrorResponse;
+export type PostTagsMutationVariables = { data: ApiCreateTagRequest };
 
 /**
  * @summary 创建标签
@@ -810,7 +815,7 @@ export const usePostTags = <TError = RenderErrorResponse, TContext = unknown>(
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postTags>>,
       TError,
-      { data: ApiCreateTagRequest },
+      PostTagsMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -819,7 +824,7 @@ export const usePostTags = <TError = RenderErrorResponse, TContext = unknown>(
 ): UseMutationResult<
   Awaited<ReturnType<typeof postTags>>,
   TError,
-  { data: ApiCreateTagRequest },
+  PostTagsMutationVariables,
   TContext
 > => {
   return useMutation(getPostTagsMutationOptions(options), queryClient);

@@ -60,6 +60,9 @@ export const deleteCommentsCommentIdLike = (
   );
 };
 
+export const getDeleteCommentsCommentIdLikeMutationKey = () =>
+  ["deleteCommentsCommentIdLike"] as const;
+
 export const getDeleteCommentsCommentIdLikeMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -67,17 +70,17 @@ export const getDeleteCommentsCommentIdLikeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>,
     TError,
-    { commentId: string },
+    DeleteCommentsCommentIdLikeMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>,
   TError,
-  { commentId: string },
+  DeleteCommentsCommentIdLikeMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deleteCommentsCommentIdLike"];
+  const mutationKey = getDeleteCommentsCommentIdLikeMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -86,7 +89,7 @@ export const getDeleteCommentsCommentIdLikeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>,
-    { commentId: string }
+    DeleteCommentsCommentIdLikeMutationVariables
   > = (props) => {
     const { commentId } = props ?? {};
 
@@ -101,6 +104,7 @@ export type DeleteCommentsCommentIdLikeMutationResult = NonNullable<
 >;
 
 export type DeleteCommentsCommentIdLikeMutationError = RenderErrorResponse;
+export type DeleteCommentsCommentIdLikeMutationVariables = { commentId: string };
 
 /**
  * @summary 取消点赞评论
@@ -110,7 +114,7 @@ export const useDeleteCommentsCommentIdLike = <TError = RenderErrorResponse, TCo
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>,
       TError,
-      { commentId: string },
+      DeleteCommentsCommentIdLikeMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -119,7 +123,7 @@ export const useDeleteCommentsCommentIdLike = <TError = RenderErrorResponse, TCo
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteCommentsCommentIdLike>>,
   TError,
-  { commentId: string },
+  DeleteCommentsCommentIdLikeMutationVariables,
   TContext
 > => {
   return useMutation(getDeleteCommentsCommentIdLikeMutationOptions(options), queryClient);
@@ -138,6 +142,8 @@ export const putCommentsCommentIdLike = (
   );
 };
 
+export const getPutCommentsCommentIdLikeMutationKey = () => ["putCommentsCommentIdLike"] as const;
+
 export const getPutCommentsCommentIdLikeMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -145,17 +151,17 @@ export const getPutCommentsCommentIdLikeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putCommentsCommentIdLike>>,
     TError,
-    { commentId: string },
+    PutCommentsCommentIdLikeMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putCommentsCommentIdLike>>,
   TError,
-  { commentId: string },
+  PutCommentsCommentIdLikeMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putCommentsCommentIdLike"];
+  const mutationKey = getPutCommentsCommentIdLikeMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -164,7 +170,7 @@ export const getPutCommentsCommentIdLikeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putCommentsCommentIdLike>>,
-    { commentId: string }
+    PutCommentsCommentIdLikeMutationVariables
   > = (props) => {
     const { commentId } = props ?? {};
 
@@ -179,6 +185,7 @@ export type PutCommentsCommentIdLikeMutationResult = NonNullable<
 >;
 
 export type PutCommentsCommentIdLikeMutationError = RenderErrorResponse;
+export type PutCommentsCommentIdLikeMutationVariables = { commentId: string };
 
 /**
  * @summary 点赞评论
@@ -188,7 +195,7 @@ export const usePutCommentsCommentIdLike = <TError = RenderErrorResponse, TConte
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putCommentsCommentIdLike>>,
       TError,
-      { commentId: string },
+      PutCommentsCommentIdLikeMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -197,7 +204,7 @@ export const usePutCommentsCommentIdLike = <TError = RenderErrorResponse, TConte
 ): UseMutationResult<
   Awaited<ReturnType<typeof putCommentsCommentIdLike>>,
   TError,
-  { commentId: string },
+  PutCommentsCommentIdLikeMutationVariables,
   TContext
 > => {
   return useMutation(getPutCommentsCommentIdLikeMutationOptions(options), queryClient);
@@ -334,6 +341,8 @@ export const deletePostsPostIdLike = (
   );
 };
 
+export const getDeletePostsPostIdLikeMutationKey = () => ["deletePostsPostIdLike"] as const;
+
 export const getDeletePostsPostIdLikeMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -341,17 +350,17 @@ export const getDeletePostsPostIdLikeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deletePostsPostIdLike>>,
     TError,
-    { postId: string },
+    DeletePostsPostIdLikeMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deletePostsPostIdLike>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdLikeMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deletePostsPostIdLike"];
+  const mutationKey = getDeletePostsPostIdLikeMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -360,7 +369,7 @@ export const getDeletePostsPostIdLikeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deletePostsPostIdLike>>,
-    { postId: string }
+    DeletePostsPostIdLikeMutationVariables
   > = (props) => {
     const { postId } = props ?? {};
 
@@ -375,6 +384,7 @@ export type DeletePostsPostIdLikeMutationResult = NonNullable<
 >;
 
 export type DeletePostsPostIdLikeMutationError = RenderErrorResponse;
+export type DeletePostsPostIdLikeMutationVariables = { postId: string };
 
 /**
  * @summary 取消点赞帖子
@@ -384,7 +394,7 @@ export const useDeletePostsPostIdLike = <TError = RenderErrorResponse, TContext 
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deletePostsPostIdLike>>,
       TError,
-      { postId: string },
+      DeletePostsPostIdLikeMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -393,7 +403,7 @@ export const useDeletePostsPostIdLike = <TError = RenderErrorResponse, TContext 
 ): UseMutationResult<
   Awaited<ReturnType<typeof deletePostsPostIdLike>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdLikeMutationVariables,
   TContext
 > => {
   return useMutation(getDeletePostsPostIdLikeMutationOptions(options), queryClient);
@@ -412,6 +422,8 @@ export const putPostsPostIdLike = (
   );
 };
 
+export const getPutPostsPostIdLikeMutationKey = () => ["putPostsPostIdLike"] as const;
+
 export const getPutPostsPostIdLikeMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -419,17 +431,17 @@ export const getPutPostsPostIdLikeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putPostsPostIdLike>>,
     TError,
-    { postId: string },
+    PutPostsPostIdLikeMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putPostsPostIdLike>>,
   TError,
-  { postId: string },
+  PutPostsPostIdLikeMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putPostsPostIdLike"];
+  const mutationKey = getPutPostsPostIdLikeMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -438,7 +450,7 @@ export const getPutPostsPostIdLikeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putPostsPostIdLike>>,
-    { postId: string }
+    PutPostsPostIdLikeMutationVariables
   > = (props) => {
     const { postId } = props ?? {};
 
@@ -453,6 +465,7 @@ export type PutPostsPostIdLikeMutationResult = NonNullable<
 >;
 
 export type PutPostsPostIdLikeMutationError = RenderErrorResponse;
+export type PutPostsPostIdLikeMutationVariables = { postId: string };
 
 /**
  * @summary 点赞帖子
@@ -462,7 +475,7 @@ export const usePutPostsPostIdLike = <TError = RenderErrorResponse, TContext = u
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putPostsPostIdLike>>,
       TError,
-      { postId: string },
+      PutPostsPostIdLikeMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -471,7 +484,7 @@ export const usePutPostsPostIdLike = <TError = RenderErrorResponse, TContext = u
 ): UseMutationResult<
   Awaited<ReturnType<typeof putPostsPostIdLike>>,
   TError,
-  { postId: string },
+  PutPostsPostIdLikeMutationVariables,
   TContext
 > => {
   return useMutation(getPutPostsPostIdLikeMutationOptions(options), queryClient);

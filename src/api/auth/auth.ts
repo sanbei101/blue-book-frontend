@@ -183,6 +183,8 @@ export const postAuthApiKeys = (
   );
 };
 
+export const getPostAuthApiKeysMutationKey = () => ["postAuthApiKeys"] as const;
+
 export const getPostAuthApiKeysMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -190,17 +192,17 @@ export const getPostAuthApiKeysMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthApiKeys>>,
     TError,
-    { data: ApiCreateAPIKeyRequest },
+    PostAuthApiKeysMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthApiKeys>>,
   TError,
-  { data: ApiCreateAPIKeyRequest },
+  PostAuthApiKeysMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postAuthApiKeys"];
+  const mutationKey = getPostAuthApiKeysMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -209,7 +211,7 @@ export const getPostAuthApiKeysMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthApiKeys>>,
-    { data: ApiCreateAPIKeyRequest }
+    PostAuthApiKeysMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -224,6 +226,7 @@ export type PostAuthApiKeysMutationResult = NonNullable<
 >;
 export type PostAuthApiKeysMutationBody = ApiCreateAPIKeyRequest;
 export type PostAuthApiKeysMutationError = RenderErrorResponse;
+export type PostAuthApiKeysMutationVariables = { data: ApiCreateAPIKeyRequest };
 
 /**
  * @summary 创建 API Key
@@ -233,7 +236,7 @@ export const usePostAuthApiKeys = <TError = RenderErrorResponse, TContext = unkn
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthApiKeys>>,
       TError,
-      { data: ApiCreateAPIKeyRequest },
+      PostAuthApiKeysMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -242,7 +245,7 @@ export const usePostAuthApiKeys = <TError = RenderErrorResponse, TContext = unkn
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthApiKeys>>,
   TError,
-  { data: ApiCreateAPIKeyRequest },
+  PostAuthApiKeysMutationVariables,
   TContext
 > => {
   return useMutation(getPostAuthApiKeysMutationOptions(options), queryClient);
@@ -261,6 +264,8 @@ export const deleteAuthApiKeysKeyId = (
   );
 };
 
+export const getDeleteAuthApiKeysKeyIdMutationKey = () => ["deleteAuthApiKeysKeyId"] as const;
+
 export const getDeleteAuthApiKeysKeyIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -268,17 +273,17 @@ export const getDeleteAuthApiKeysKeyIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
     TError,
-    { keyId: string },
+    DeleteAuthApiKeysKeyIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
   TError,
-  { keyId: string },
+  DeleteAuthApiKeysKeyIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deleteAuthApiKeysKeyId"];
+  const mutationKey = getDeleteAuthApiKeysKeyIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -287,7 +292,7 @@ export const getDeleteAuthApiKeysKeyIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
-    { keyId: string }
+    DeleteAuthApiKeysKeyIdMutationVariables
   > = (props) => {
     const { keyId } = props ?? {};
 
@@ -302,6 +307,7 @@ export type DeleteAuthApiKeysKeyIdMutationResult = NonNullable<
 >;
 
 export type DeleteAuthApiKeysKeyIdMutationError = RenderErrorResponse;
+export type DeleteAuthApiKeysKeyIdMutationVariables = { keyId: string };
 
 /**
  * @summary 撤销 API Key
@@ -311,7 +317,7 @@ export const useDeleteAuthApiKeysKeyId = <TError = RenderErrorResponse, TContext
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
       TError,
-      { keyId: string },
+      DeleteAuthApiKeysKeyIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -320,7 +326,7 @@ export const useDeleteAuthApiKeysKeyId = <TError = RenderErrorResponse, TContext
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteAuthApiKeysKeyId>>,
   TError,
-  { keyId: string },
+  DeleteAuthApiKeysKeyIdMutationVariables,
   TContext
 > => {
   return useMutation(getDeleteAuthApiKeysKeyIdMutationOptions(options), queryClient);
@@ -345,6 +351,8 @@ export const postAuthLogin = (
   );
 };
 
+export const getPostAuthLoginMutationKey = () => ["postAuthLogin"] as const;
+
 export const getPostAuthLoginMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -352,17 +360,17 @@ export const getPostAuthLoginMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthLogin>>,
     TError,
-    { data: ApiLoginRequest },
+    PostAuthLoginMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
-  { data: ApiLoginRequest },
+  PostAuthLoginMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postAuthLogin"];
+  const mutationKey = getPostAuthLoginMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -371,7 +379,7 @@ export const getPostAuthLoginMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthLogin>>,
-    { data: ApiLoginRequest }
+    PostAuthLoginMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -384,6 +392,7 @@ export const getPostAuthLoginMutationOptions = <
 export type PostAuthLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogin>>>;
 export type PostAuthLoginMutationBody = ApiLoginRequest;
 export type PostAuthLoginMutationError = RenderErrorResponse;
+export type PostAuthLoginMutationVariables = { data: ApiLoginRequest };
 
 /**
  * @summary 用户登录
@@ -393,7 +402,7 @@ export const usePostAuthLogin = <TError = RenderErrorResponse, TContext = unknow
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthLogin>>,
       TError,
-      { data: ApiLoginRequest },
+      PostAuthLoginMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -402,7 +411,7 @@ export const usePostAuthLogin = <TError = RenderErrorResponse, TContext = unknow
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
-  { data: ApiLoginRequest },
+  PostAuthLoginMutationVariables,
   TContext
 > => {
   return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
@@ -420,6 +429,8 @@ export const postAuthLogout = (
   );
 };
 
+export const getPostAuthLogoutMutationKey = () => ["postAuthLogout"] as const;
+
 export const getPostAuthLogoutMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -427,7 +438,7 @@ export const getPostAuthLogoutMutationOptions = <
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError, void, TContext>;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError, void, TContext> => {
-  const mutationKey = ["postAuthLogout"];
+  const mutationKey = getPostAuthLogoutMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -592,6 +603,8 @@ export const putAuthPassword = (
   );
 };
 
+export const getPutAuthPasswordMutationKey = () => ["putAuthPassword"] as const;
+
 export const getPutAuthPasswordMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -599,17 +612,17 @@ export const getPutAuthPasswordMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putAuthPassword>>,
     TError,
-    { data: ApiChangePasswordRequest },
+    PutAuthPasswordMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putAuthPassword>>,
   TError,
-  { data: ApiChangePasswordRequest },
+  PutAuthPasswordMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putAuthPassword"];
+  const mutationKey = getPutAuthPasswordMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -618,7 +631,7 @@ export const getPutAuthPasswordMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putAuthPassword>>,
-    { data: ApiChangePasswordRequest }
+    PutAuthPasswordMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -633,6 +646,7 @@ export type PutAuthPasswordMutationResult = NonNullable<
 >;
 export type PutAuthPasswordMutationBody = ApiChangePasswordRequest;
 export type PutAuthPasswordMutationError = RenderErrorResponse;
+export type PutAuthPasswordMutationVariables = { data: ApiChangePasswordRequest };
 
 /**
  * @summary 修改密码
@@ -642,7 +656,7 @@ export const usePutAuthPassword = <TError = RenderErrorResponse, TContext = unkn
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putAuthPassword>>,
       TError,
-      { data: ApiChangePasswordRequest },
+      PutAuthPasswordMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -651,7 +665,7 @@ export const usePutAuthPassword = <TError = RenderErrorResponse, TContext = unkn
 ): UseMutationResult<
   Awaited<ReturnType<typeof putAuthPassword>>,
   TError,
-  { data: ApiChangePasswordRequest },
+  PutAuthPasswordMutationVariables,
   TContext
 > => {
   return useMutation(getPutAuthPasswordMutationOptions(options), queryClient);
@@ -676,6 +690,8 @@ export const postAuthRefresh = (
   );
 };
 
+export const getPostAuthRefreshMutationKey = () => ["postAuthRefresh"] as const;
+
 export const getPostAuthRefreshMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -683,17 +699,17 @@ export const getPostAuthRefreshMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthRefresh>>,
     TError,
-    { data: ApiRefreshTokenRequest },
+    PostAuthRefreshMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthRefresh>>,
   TError,
-  { data: ApiRefreshTokenRequest },
+  PostAuthRefreshMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postAuthRefresh"];
+  const mutationKey = getPostAuthRefreshMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -702,7 +718,7 @@ export const getPostAuthRefreshMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthRefresh>>,
-    { data: ApiRefreshTokenRequest }
+    PostAuthRefreshMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -717,6 +733,7 @@ export type PostAuthRefreshMutationResult = NonNullable<
 >;
 export type PostAuthRefreshMutationBody = ApiRefreshTokenRequest;
 export type PostAuthRefreshMutationError = RenderErrorResponse;
+export type PostAuthRefreshMutationVariables = { data: ApiRefreshTokenRequest };
 
 /**
  * @summary 刷新登录凭证
@@ -726,7 +743,7 @@ export const usePostAuthRefresh = <TError = RenderErrorResponse, TContext = unkn
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthRefresh>>,
       TError,
-      { data: ApiRefreshTokenRequest },
+      PostAuthRefreshMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -735,7 +752,7 @@ export const usePostAuthRefresh = <TError = RenderErrorResponse, TContext = unkn
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthRefresh>>,
   TError,
-  { data: ApiRefreshTokenRequest },
+  PostAuthRefreshMutationVariables,
   TContext
 > => {
   return useMutation(getPostAuthRefreshMutationOptions(options), queryClient);
@@ -760,6 +777,8 @@ export const postAuthRegister = (
   );
 };
 
+export const getPostAuthRegisterMutationKey = () => ["postAuthRegister"] as const;
+
 export const getPostAuthRegisterMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -767,17 +786,17 @@ export const getPostAuthRegisterMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAuthRegister>>,
     TError,
-    { data: ApiRegisterRequest },
+    PostAuthRegisterMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthRegister>>,
   TError,
-  { data: ApiRegisterRequest },
+  PostAuthRegisterMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postAuthRegister"];
+  const mutationKey = getPostAuthRegisterMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -786,7 +805,7 @@ export const getPostAuthRegisterMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthRegister>>,
-    { data: ApiRegisterRequest }
+    PostAuthRegisterMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -801,6 +820,7 @@ export type PostAuthRegisterMutationResult = NonNullable<
 >;
 export type PostAuthRegisterMutationBody = ApiRegisterRequest;
 export type PostAuthRegisterMutationError = RenderErrorResponse;
+export type PostAuthRegisterMutationVariables = { data: ApiRegisterRequest };
 
 /**
  * @summary 用户注册
@@ -810,7 +830,7 @@ export const usePostAuthRegister = <TError = RenderErrorResponse, TContext = unk
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postAuthRegister>>,
       TError,
-      { data: ApiRegisterRequest },
+      PostAuthRegisterMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -819,7 +839,7 @@ export const usePostAuthRegister = <TError = RenderErrorResponse, TContext = unk
 ): UseMutationResult<
   Awaited<ReturnType<typeof postAuthRegister>>,
   TError,
-  { data: ApiRegisterRequest },
+  PostAuthRegisterMutationVariables,
   TContext
 > => {
   return useMutation(getPostAuthRegisterMutationOptions(options), queryClient);

@@ -179,6 +179,9 @@ export const patchNotificationsNotificationIdRead = (
   );
 };
 
+export const getPatchNotificationsNotificationIdReadMutationKey = () =>
+  ["patchNotificationsNotificationIdRead"] as const;
+
 export const getPatchNotificationsNotificationIdReadMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -186,17 +189,17 @@ export const getPatchNotificationsNotificationIdReadMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof patchNotificationsNotificationIdRead>>,
     TError,
-    { notificationId: string },
+    PatchNotificationsNotificationIdReadMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof patchNotificationsNotificationIdRead>>,
   TError,
-  { notificationId: string },
+  PatchNotificationsNotificationIdReadMutationVariables,
   TContext
 > => {
-  const mutationKey = ["patchNotificationsNotificationIdRead"];
+  const mutationKey = getPatchNotificationsNotificationIdReadMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -205,7 +208,7 @@ export const getPatchNotificationsNotificationIdReadMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof patchNotificationsNotificationIdRead>>,
-    { notificationId: string }
+    PatchNotificationsNotificationIdReadMutationVariables
   > = (props) => {
     const { notificationId } = props ?? {};
 
@@ -220,6 +223,7 @@ export type PatchNotificationsNotificationIdReadMutationResult = NonNullable<
 >;
 
 export type PatchNotificationsNotificationIdReadMutationError = RenderErrorResponse;
+export type PatchNotificationsNotificationIdReadMutationVariables = { notificationId: string };
 
 /**
  * @summary 标记通知为已读
@@ -232,7 +236,7 @@ export const usePatchNotificationsNotificationIdRead = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof patchNotificationsNotificationIdRead>>,
       TError,
-      { notificationId: string },
+      PatchNotificationsNotificationIdReadMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -241,7 +245,7 @@ export const usePatchNotificationsNotificationIdRead = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof patchNotificationsNotificationIdRead>>,
   TError,
-  { notificationId: string },
+  PatchNotificationsNotificationIdReadMutationVariables,
   TContext
 > => {
   return useMutation(getPatchNotificationsNotificationIdReadMutationOptions(options), queryClient);
@@ -258,6 +262,8 @@ export const postNotificationsReadAll = (
     options,
   );
 };
+
+export const getPostNotificationsReadAllMutationKey = () => ["postNotificationsReadAll"] as const;
 
 export const getPostNotificationsReadAllMutationOptions = <
   TError = RenderErrorResponse,
@@ -276,7 +282,7 @@ export const getPostNotificationsReadAllMutationOptions = <
   void,
   TContext
 > => {
-  const mutationKey = ["postNotificationsReadAll"];
+  const mutationKey = getPostNotificationsReadAllMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options

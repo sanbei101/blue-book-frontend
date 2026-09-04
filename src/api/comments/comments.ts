@@ -68,6 +68,8 @@ export const postComments = (
   );
 };
 
+export const getPostCommentsMutationKey = () => ["postComments"] as const;
+
 export const getPostCommentsMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -75,17 +77,17 @@ export const getPostCommentsMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postComments>>,
     TError,
-    { data: ApiCreateCommentRequest },
+    PostCommentsMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postComments>>,
   TError,
-  { data: ApiCreateCommentRequest },
+  PostCommentsMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postComments"];
+  const mutationKey = getPostCommentsMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -94,7 +96,7 @@ export const getPostCommentsMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postComments>>,
-    { data: ApiCreateCommentRequest }
+    PostCommentsMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -107,6 +109,7 @@ export const getPostCommentsMutationOptions = <
 export type PostCommentsMutationResult = NonNullable<Awaited<ReturnType<typeof postComments>>>;
 export type PostCommentsMutationBody = ApiCreateCommentRequest;
 export type PostCommentsMutationError = RenderErrorResponse;
+export type PostCommentsMutationVariables = { data: ApiCreateCommentRequest };
 
 /**
  * @summary 创建评论
@@ -116,7 +119,7 @@ export const usePostComments = <TError = RenderErrorResponse, TContext = unknown
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postComments>>,
       TError,
-      { data: ApiCreateCommentRequest },
+      PostCommentsMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -125,7 +128,7 @@ export const usePostComments = <TError = RenderErrorResponse, TContext = unknown
 ): UseMutationResult<
   Awaited<ReturnType<typeof postComments>>,
   TError,
-  { data: ApiCreateCommentRequest },
+  PostCommentsMutationVariables,
   TContext
 > => {
   return useMutation(getPostCommentsMutationOptions(options), queryClient);
@@ -144,6 +147,8 @@ export const deleteCommentsCommentId = (
   );
 };
 
+export const getDeleteCommentsCommentIdMutationKey = () => ["deleteCommentsCommentId"] as const;
+
 export const getDeleteCommentsCommentIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -151,17 +156,17 @@ export const getDeleteCommentsCommentIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteCommentsCommentId>>,
     TError,
-    { commentId: string },
+    DeleteCommentsCommentIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteCommentsCommentId>>,
   TError,
-  { commentId: string },
+  DeleteCommentsCommentIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deleteCommentsCommentId"];
+  const mutationKey = getDeleteCommentsCommentIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -170,7 +175,7 @@ export const getDeleteCommentsCommentIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteCommentsCommentId>>,
-    { commentId: string }
+    DeleteCommentsCommentIdMutationVariables
   > = (props) => {
     const { commentId } = props ?? {};
 
@@ -185,6 +190,7 @@ export type DeleteCommentsCommentIdMutationResult = NonNullable<
 >;
 
 export type DeleteCommentsCommentIdMutationError = RenderErrorResponse;
+export type DeleteCommentsCommentIdMutationVariables = { commentId: string };
 
 /**
  * @summary 删除评论
@@ -194,7 +200,7 @@ export const useDeleteCommentsCommentId = <TError = RenderErrorResponse, TContex
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteCommentsCommentId>>,
       TError,
-      { commentId: string },
+      DeleteCommentsCommentIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -203,7 +209,7 @@ export const useDeleteCommentsCommentId = <TError = RenderErrorResponse, TContex
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteCommentsCommentId>>,
   TError,
-  { commentId: string },
+  DeleteCommentsCommentIdMutationVariables,
   TContext
 > => {
   return useMutation(getDeleteCommentsCommentIdMutationOptions(options), queryClient);

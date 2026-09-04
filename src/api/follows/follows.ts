@@ -61,6 +61,8 @@ export const deleteUsersUserIdFollow = (
   );
 };
 
+export const getDeleteUsersUserIdFollowMutationKey = () => ["deleteUsersUserIdFollow"] as const;
+
 export const getDeleteUsersUserIdFollowMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -68,17 +70,17 @@ export const getDeleteUsersUserIdFollowMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteUsersUserIdFollow>>,
     TError,
-    { userId: string },
+    DeleteUsersUserIdFollowMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteUsersUserIdFollow>>,
   TError,
-  { userId: string },
+  DeleteUsersUserIdFollowMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deleteUsersUserIdFollow"];
+  const mutationKey = getDeleteUsersUserIdFollowMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -87,7 +89,7 @@ export const getDeleteUsersUserIdFollowMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteUsersUserIdFollow>>,
-    { userId: string }
+    DeleteUsersUserIdFollowMutationVariables
   > = (props) => {
     const { userId } = props ?? {};
 
@@ -102,6 +104,7 @@ export type DeleteUsersUserIdFollowMutationResult = NonNullable<
 >;
 
 export type DeleteUsersUserIdFollowMutationError = RenderErrorResponse;
+export type DeleteUsersUserIdFollowMutationVariables = { userId: string };
 
 /**
  * @summary 取消关注
@@ -111,7 +114,7 @@ export const useDeleteUsersUserIdFollow = <TError = RenderErrorResponse, TContex
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteUsersUserIdFollow>>,
       TError,
-      { userId: string },
+      DeleteUsersUserIdFollowMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -120,7 +123,7 @@ export const useDeleteUsersUserIdFollow = <TError = RenderErrorResponse, TContex
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteUsersUserIdFollow>>,
   TError,
-  { userId: string },
+  DeleteUsersUserIdFollowMutationVariables,
   TContext
 > => {
   return useMutation(getDeleteUsersUserIdFollowMutationOptions(options), queryClient);
@@ -139,6 +142,8 @@ export const putUsersUserIdFollow = (
   );
 };
 
+export const getPutUsersUserIdFollowMutationKey = () => ["putUsersUserIdFollow"] as const;
+
 export const getPutUsersUserIdFollowMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -146,17 +151,17 @@ export const getPutUsersUserIdFollowMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putUsersUserIdFollow>>,
     TError,
-    { userId: string },
+    PutUsersUserIdFollowMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putUsersUserIdFollow>>,
   TError,
-  { userId: string },
+  PutUsersUserIdFollowMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putUsersUserIdFollow"];
+  const mutationKey = getPutUsersUserIdFollowMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -165,7 +170,7 @@ export const getPutUsersUserIdFollowMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putUsersUserIdFollow>>,
-    { userId: string }
+    PutUsersUserIdFollowMutationVariables
   > = (props) => {
     const { userId } = props ?? {};
 
@@ -180,6 +185,7 @@ export type PutUsersUserIdFollowMutationResult = NonNullable<
 >;
 
 export type PutUsersUserIdFollowMutationError = RenderErrorResponse;
+export type PutUsersUserIdFollowMutationVariables = { userId: string };
 
 /**
  * @summary 关注用户
@@ -189,7 +195,7 @@ export const usePutUsersUserIdFollow = <TError = RenderErrorResponse, TContext =
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putUsersUserIdFollow>>,
       TError,
-      { userId: string },
+      PutUsersUserIdFollowMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -198,7 +204,7 @@ export const usePutUsersUserIdFollow = <TError = RenderErrorResponse, TContext =
 ): UseMutationResult<
   Awaited<ReturnType<typeof putUsersUserIdFollow>>,
   TError,
-  { userId: string },
+  PutUsersUserIdFollowMutationVariables,
   TContext
 > => {
   return useMutation(getPutUsersUserIdFollowMutationOptions(options), queryClient);

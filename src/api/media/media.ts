@@ -42,6 +42,8 @@ export const postMediaPresign = (
   );
 };
 
+export const getPostMediaPresignMutationKey = () => ["postMediaPresign"] as const;
+
 export const getPostMediaPresignMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -49,17 +51,17 @@ export const getPostMediaPresignMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postMediaPresign>>,
     TError,
-    { data: ApiPresignMediaRequest },
+    PostMediaPresignMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postMediaPresign>>,
   TError,
-  { data: ApiPresignMediaRequest },
+  PostMediaPresignMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postMediaPresign"];
+  const mutationKey = getPostMediaPresignMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -68,7 +70,7 @@ export const getPostMediaPresignMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postMediaPresign>>,
-    { data: ApiPresignMediaRequest }
+    PostMediaPresignMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -83,6 +85,7 @@ export type PostMediaPresignMutationResult = NonNullable<
 >;
 export type PostMediaPresignMutationBody = ApiPresignMediaRequest;
 export type PostMediaPresignMutationError = RenderErrorResponse;
+export type PostMediaPresignMutationVariables = { data: ApiPresignMediaRequest };
 
 /**
  * @summary 获取媒体上传地址
@@ -92,7 +95,7 @@ export const usePostMediaPresign = <TError = RenderErrorResponse, TContext = unk
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postMediaPresign>>,
       TError,
-      { data: ApiPresignMediaRequest },
+      PostMediaPresignMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -101,7 +104,7 @@ export const usePostMediaPresign = <TError = RenderErrorResponse, TContext = unk
 ): UseMutationResult<
   Awaited<ReturnType<typeof postMediaPresign>>,
   TError,
-  { data: ApiPresignMediaRequest },
+  PostMediaPresignMutationVariables,
   TContext
 > => {
   return useMutation(getPostMediaPresignMutationOptions(options), queryClient);

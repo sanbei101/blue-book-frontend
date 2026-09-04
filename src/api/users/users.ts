@@ -297,6 +297,8 @@ export const putUsersProfile = (
   );
 };
 
+export const getPutUsersProfileMutationKey = () => ["putUsersProfile"] as const;
+
 export const getPutUsersProfileMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -304,17 +306,17 @@ export const getPutUsersProfileMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putUsersProfile>>,
     TError,
-    { data: ApiUpdateProfileRequest },
+    PutUsersProfileMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putUsersProfile>>,
   TError,
-  { data: ApiUpdateProfileRequest },
+  PutUsersProfileMutationVariables,
   TContext
 > => {
-  const mutationKey = ["putUsersProfile"];
+  const mutationKey = getPutUsersProfileMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -323,7 +325,7 @@ export const getPutUsersProfileMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putUsersProfile>>,
-    { data: ApiUpdateProfileRequest }
+    PutUsersProfileMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -338,6 +340,7 @@ export type PutUsersProfileMutationResult = NonNullable<
 >;
 export type PutUsersProfileMutationBody = ApiUpdateProfileRequest;
 export type PutUsersProfileMutationError = RenderErrorResponse;
+export type PutUsersProfileMutationVariables = { data: ApiUpdateProfileRequest };
 
 /**
  * @summary 更新用户资料
@@ -347,7 +350,7 @@ export const usePutUsersProfile = <TError = RenderErrorResponse, TContext = unkn
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putUsersProfile>>,
       TError,
-      { data: ApiUpdateProfileRequest },
+      PutUsersProfileMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -356,7 +359,7 @@ export const usePutUsersProfile = <TError = RenderErrorResponse, TContext = unkn
 ): UseMutationResult<
   Awaited<ReturnType<typeof putUsersProfile>>,
   TError,
-  { data: ApiUpdateProfileRequest },
+  PutUsersProfileMutationVariables,
   TContext
 > => {
   return useMutation(getPutUsersProfileMutationOptions(options), queryClient);

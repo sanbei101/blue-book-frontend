@@ -308,6 +308,8 @@ export const postPosts = (
   );
 };
 
+export const getPostPostsMutationKey = () => ["postPosts"] as const;
+
 export const getPostPostsMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -315,17 +317,17 @@ export const getPostPostsMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postPosts>>,
     TError,
-    { data: ApiCreatePostRequest },
+    PostPostsMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postPosts>>,
   TError,
-  { data: ApiCreatePostRequest },
+  PostPostsMutationVariables,
   TContext
 > => {
-  const mutationKey = ["postPosts"];
+  const mutationKey = getPostPostsMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -334,7 +336,7 @@ export const getPostPostsMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postPosts>>,
-    { data: ApiCreatePostRequest }
+    PostPostsMutationVariables
   > = (props) => {
     const { data } = props ?? {};
 
@@ -347,6 +349,7 @@ export const getPostPostsMutationOptions = <
 export type PostPostsMutationResult = NonNullable<Awaited<ReturnType<typeof postPosts>>>;
 export type PostPostsMutationBody = ApiCreatePostRequest;
 export type PostPostsMutationError = RenderErrorResponse;
+export type PostPostsMutationVariables = { data: ApiCreatePostRequest };
 
 /**
  * @summary 创建帖子
@@ -356,7 +359,7 @@ export const usePostPosts = <TError = RenderErrorResponse, TContext = unknown>(
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postPosts>>,
       TError,
-      { data: ApiCreatePostRequest },
+      PostPostsMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -365,7 +368,7 @@ export const usePostPosts = <TError = RenderErrorResponse, TContext = unknown>(
 ): UseMutationResult<
   Awaited<ReturnType<typeof postPosts>>,
   TError,
-  { data: ApiCreatePostRequest },
+  PostPostsMutationVariables,
   TContext
 > => {
   return useMutation(getPostPostsMutationOptions(options), queryClient);
@@ -384,6 +387,8 @@ export const deletePostsPostId = (
   );
 };
 
+export const getDeletePostsPostIdMutationKey = () => ["deletePostsPostId"] as const;
+
 export const getDeletePostsPostIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -391,17 +396,17 @@ export const getDeletePostsPostIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deletePostsPostId>>,
     TError,
-    { postId: string },
+    DeletePostsPostIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deletePostsPostId>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["deletePostsPostId"];
+  const mutationKey = getDeletePostsPostIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -410,7 +415,7 @@ export const getDeletePostsPostIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deletePostsPostId>>,
-    { postId: string }
+    DeletePostsPostIdMutationVariables
   > = (props) => {
     const { postId } = props ?? {};
 
@@ -425,6 +430,7 @@ export type DeletePostsPostIdMutationResult = NonNullable<
 >;
 
 export type DeletePostsPostIdMutationError = RenderErrorResponse;
+export type DeletePostsPostIdMutationVariables = { postId: string };
 
 /**
  * @summary 删除帖子
@@ -434,7 +440,7 @@ export const useDeletePostsPostId = <TError = RenderErrorResponse, TContext = un
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deletePostsPostId>>,
       TError,
-      { postId: string },
+      DeletePostsPostIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -443,7 +449,7 @@ export const useDeletePostsPostId = <TError = RenderErrorResponse, TContext = un
 ): UseMutationResult<
   Awaited<ReturnType<typeof deletePostsPostId>>,
   TError,
-  { postId: string },
+  DeletePostsPostIdMutationVariables,
   TContext
 > => {
   return useMutation(getDeletePostsPostIdMutationOptions(options), queryClient);
@@ -590,6 +596,8 @@ export const patchPostsPostId = (
   );
 };
 
+export const getPatchPostsPostIdMutationKey = () => ["patchPostsPostId"] as const;
+
 export const getPatchPostsPostIdMutationOptions = <
   TError = RenderErrorResponse,
   TContext = unknown,
@@ -597,17 +605,17 @@ export const getPatchPostsPostIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof patchPostsPostId>>,
     TError,
-    { postId: string; data: ApiUpdatePostRequest },
+    PatchPostsPostIdMutationVariables,
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof patchPostsPostId>>,
   TError,
-  { postId: string; data: ApiUpdatePostRequest },
+  PatchPostsPostIdMutationVariables,
   TContext
 > => {
-  const mutationKey = ["patchPostsPostId"];
+  const mutationKey = getPatchPostsPostIdMutationKey();
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
       ? options
@@ -616,7 +624,7 @@ export const getPatchPostsPostIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof patchPostsPostId>>,
-    { postId: string; data: ApiUpdatePostRequest }
+    PatchPostsPostIdMutationVariables
   > = (props) => {
     const { postId, data } = props ?? {};
 
@@ -631,6 +639,7 @@ export type PatchPostsPostIdMutationResult = NonNullable<
 >;
 export type PatchPostsPostIdMutationBody = ApiUpdatePostRequest;
 export type PatchPostsPostIdMutationError = RenderErrorResponse;
+export type PatchPostsPostIdMutationVariables = { postId: string; data: ApiUpdatePostRequest };
 
 /**
  * @summary 编辑帖子
@@ -640,7 +649,7 @@ export const usePatchPostsPostId = <TError = RenderErrorResponse, TContext = unk
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof patchPostsPostId>>,
       TError,
-      { postId: string; data: ApiUpdatePostRequest },
+      PatchPostsPostIdMutationVariables,
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -649,7 +658,7 @@ export const usePatchPostsPostId = <TError = RenderErrorResponse, TContext = unk
 ): UseMutationResult<
   Awaited<ReturnType<typeof patchPostsPostId>>,
   TError,
-  { postId: string; data: ApiUpdatePostRequest },
+  PatchPostsPostIdMutationVariables,
   TContext
 > => {
   return useMutation(getPatchPostsPostIdMutationOptions(options), queryClient);
